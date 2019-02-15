@@ -8,7 +8,7 @@ namespace YunWeiPingTai.Common
 {
     public static class MvcHelper
     {
-        //我做了一下修改试试
+        //
         public static string GetValidMsg(ModelStateDictionary modelState)
         {
             StringBuilder sb = new StringBuilder();
