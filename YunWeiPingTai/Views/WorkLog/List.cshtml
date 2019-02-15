@@ -1,0 +1,325 @@
+﻿@model WorkLogListViewModel
+
+<div class="row">
+    <div class="col-xs-12 col-sm-7 col-md-7 col-lg-4">
+        <h1 class="page-title txt-color-blueDark">
+            <i class="fa fa-pencil-square-o fa-fw "></i>
+            工作日志
+            <span>
+                >
+                查看日志
+            </span>
+        </h1>
+    </div>
+
+</div>
+
+<!-- widget grid -->
+<section id="widget-grid" class="">
+
+
+
+
+    <!-- row -->
+
+    <div class="row">
+
+        <!-- NEW WIDGET START -->
+        <article class="col-sm-12 col-md-12 col-lg-6">
+
+            <!-- Widget ID (each widget will need unique ID)-->
+            <div class="jarviswidget jarviswidget-color-blue" id="wid-id-0" data-widget-colorbutton="false" data-widget-editbutton="false" data-widget-togglebutton="false" data-widget-fullscreenbutton="false" data-widget-sortable="false">
+                
+                <header>
+                    <span class="widget-icon">
+                        <i class="fa fa-pencil"></i>
+                    </span>
+                    <h2>编辑日志</h2>
+
+                </header>
+
+                <!-- widget div-->
+                <div>
+
+                    <!-- widget edit box -->
+                    <div class="jarviswidget-editbox">
+                        <!-- This area used as dropdown edit box -->
+
+                    </div>
+                    <!-- end widget edit box -->
+                    <!-- widget content -->
+                    <div class="widget-body no-padding">
+
+                        <div class="summernote">
+
+                        </div>
+
+                        <div class="widget-footer smart-form">
+
+                            <div class="btn-group">
+
+                                <button class="btn btn-sm btn-primary" type="button" id="btnCancel">
+                                    <i class="fa fa-times"></i> 重置
+                                </button>
+
+                            </div>
+                            <div class="btn-group">
+
+                                <button class="btn btn-sm btn-success" type="button" id="btnSave">
+                                    <i class="fa fa-check"></i> 保存
+                                </button>
+
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+                    <!-- end widget content -->
+
+                </div>
+                <!-- end widget div -->
+
+            </div>
+            <!-- end widget -->
+
+        </article>
+        <!-- WIDGET END -->
+
+        <article class="col-sm-12 col-md-12 col-lg-6">
+           
+                @foreach (var log in Model.WorkLogs)
+                {
+                    <span class="timeline-seperator text-center">
+                        <span>@log.CreateTime.ToShortDateString()</span>
+                    </span>
+                    <div class="chat-body no-padding profile-message">
+                        <ul>
+                            <li class="message">
+                                <img src="~/img/avatars/3.png" class="online" alt="user">
+                                <span class="message-text" style="min-height: 50px">
+                                    <a href="javascript:void(0);" class="username">@log.UserName</a>
+                                    @Html.Raw(@log.LogContent)
+                                </span>
+                                <ul class="list-inline font-xs">
+                                    <li>
+                                        <a href="javascript:void(0);" class="text-primary">编辑</a>
+                                    </li>
+                                    <li>
+                                        <a asp-controller="WorkLog" asp-action="Delete" title="删除" asp-route-id="@log.Id" data-action="delete" class="text-danger">删除</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            @foreach (var reply in Model.WorkLogReplies)
+                            {
+                                if (reply.WorkLogId == log.Id)
+                                {
+                                    <li class="message message-reply">
+                                        <img src="~/img/avatars/3.png" class="online" alt="user">
+                                        <span class="message-text"> <a href="javascript:void(0);" class="username">@reply.AdminName</a>
+                                            @reply.Reply
+                                            <i class="fa fa-smile-o txt-color-orange"></i> </span>
+
+                                        <ul class="list-inline font-xs">
+                                            <li>
+                                                <a href="javascript:void(0);" class="text-muted">@reply.CreateTime.ToString("yyyy-MM-dd HH:mm:ss")</a>
+                                            </li>
+                                        </ul>
+
+                                    </li>
+                                }
+                            }
+                            <li>
+                                <div class="input-group wall-comment-reply">
+                                    <input id="reply-input-@log.Id" type="text" class="form-control" placeholder="写上对他的评语">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-primary" id="btn-chat" onclick="reply(@log.Id)">
+                                            <i class="fa fa-reply"></i> 回复
+                                        </button>
+                                    </span>
+                                </div>
+                            </li>
+
+                        </ul>
+
+                    </div>
+                @*<form method="post" class="well padding-bottom-10" >
+                    <textarea rows="2" class="form-control" placeholder="写上对他的评语"></textarea>
+                    <div class="margin-top-10">
+                        <button type="button" onclick="reply(@log.Id)" class="btn btn-sm btn-primary pull-right">
+                            保存
+                        </button>
+                    </div>
+                </form>*@
+                }
+
+        </article>
+    </div>
+
+    <!-- end row -->
+
+</section>
+<!-- end widget grid -->
+@section Scripts {
+    
+    <script type="text/javascript">
+
+        /* DO NOT REMOVE : GLOBAL FUNCTIONS!
+     *
+     * pageSetUp(); WILL CALL THE FOLLOWING FUNCTIONS
+     *
+     * // activate tooltips
+     * $("[rel=tooltip]").tooltip();
+     *
+     * // activate popovers
+     * $("[rel=popover]").popover();
+     *
+     * // activate popovers with hover states
+     * $("[rel=popover-hover]").popover({ trigger: "hover" });
+     *
+     * // activate inline charts
+     * runAllCharts();
+     *
+     * // setup widgets
+     * setup_widgets_desktop();
+     *
+     * // run form elements
+     * runAllForms();
+     *
+     ********************************
+     *
+     * pageSetUp() is needed whenever you load a page.
+     * It initializes and checks for all basic elements of the page
+     * and makes rendering easier.
+     *
+     */
+
+        pageSetUp();
+
+        function reply(id) {
+            var mess = $("#reply-input-" + id).val();
+            if (mess.length <= 0) {
+                toastr.warning("请输入评论内容");
+                return;
+            }
+            $.ajax({
+                url: "/WorkLog/AddReply",
+                type: "POST",
+                dataType: "json",
+                data: { reply: mess.trim() ,logId:id},
+                success: function (res) {
+                    if (res.status == "ok") {
+                        toastr.success("评论成功");
+                        location.reload();
+                    } else if (res.status == "redirect") {
+                        toastr.warning(res.errorMsg);
+                        location.href = res.data;
+                        return;
+                    } else {
+                        toastr.warning(res.errorMsg);
+                        return;
+                    }
+                },
+                error: function (res) {
+                    toastr.error("网络连接异常");
+                    return;
+                }
+
+            });
+        }
+
+        $(function() {
+
+            //toastr
+            toastr.options = {
+                positionClass: "toast-top-center"
+            };
+
+        });
+        // PAGE RELATED SCRIPTS
+        //保存
+        $("#btnSave").click(function() {
+            var aHTML = $('.summernote').summernote('code');
+            if (aHTML.trim().length <= 0) {
+                toastr.warning("请填写日志");
+                return;
+            }
+            $.ajax({
+                url: "/WorkLog/Add",
+                type: "POST",
+                dataType: "json",
+                data: { log: aHTML.trim() },
+                success: function(res) {
+                    if (res.status == "ok") {
+                        toastr.success("日志保存成功");
+                        location.reload();
+                    } else if (res.status == "redirect") {
+                        toastr.warning(res.errorMsg);
+                        location.href = res.data;
+                        return;
+                    } else {
+                        toastr.warning(res.errorMsg);
+                        return;
+                    }
+                },
+                error: function(res) {
+                    toastr.error("网络连接异常");
+                    return;
+                }
+
+            });
+        });
+        //重置
+        $("#btnCancel").click(function() {
+            $('.summernote').summernote('reset');
+        });
+
+        // pagefunction
+
+        var pagefunction = function() {
+
+            // summernote
+            $('.summernote').summernote({
+                toolbar: [], //取消了所有的工具按钮
+                height: 200
+            });
+
+
+        };
+
+        // end pagefunction
+
+        // destroy generated instances
+        // pagedestroy is called automatically before loading a new page
+        // only usable in AJAX version!
+
+        var pagedestroy = function() {
+
+            // destroy summernote
+            $(".summernote").summernote('destroy');
+
+
+            // debug msg
+            if (debugState) {
+                root.console.log("✔ Summernote editors destroyed");
+            }
+
+        };
+
+        // end destroy
+
+        // load summernote, and all markdown related plugins
+        loadScript("/js/plugin/summernote/summernote.min.js",
+            function() {
+                loadScript("/js/plugin/markdown/markdown.min.js",
+                    function() {
+                        loadScript("/js/plugin/markdown/to-markdown.min.js",
+                            function() {
+                                loadScript("/js/plugin/markdown/bootstrap-markdown.min.js", pagefunction);
+                            });
+                    });
+            });
+
+    </script>
+}

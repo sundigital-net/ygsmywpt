@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyWebApi", "MyWebApi\MyWebApi.csproj", "{8C658218-858B-40F5-81F1-ABD738CAA262}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YunWeiPingTai", "YunWeiPingTai\YunWeiPingTai.csproj", "{ED05A966-3889-4D57-919E-9031C9D6ED44}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YunWeiPingTai.DTO", "YunWeiPingTai.DTO\YunWeiPingTai.DTO.csproj", "{C590736B-4A91-4138-A31E-603EA51646C9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YunWeiPingTai.IService", "YunWeiPingTai.IService\YunWeiPingTai.IService.csproj", "{52E29B7C-EBB0-428C-A826-C10B3E478C2B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YunWeiPingTai.Service", "YunWeiPingTai.Service\YunWeiPingTai.Service.csproj", "{701AF0B0-6952-4AD2-9115-76B2B5CC9C93}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YunWeiPingTai.Common", "YunWeiPingTai.Common\YunWeiPingTai.Common.csproj", "{4C319F2C-8422-48F5-950E-C43E2049D502}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6B106EFA-8CB7-4AEE-A0D0-C80F386F7307}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C658218-858B-40F5-81F1-ABD738CAA262}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C658218-858B-40F5-81F1-ABD738CAA262}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C658218-858B-40F5-81F1-ABD738CAA262}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C658218-858B-40F5-81F1-ABD738CAA262}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED05A966-3889-4D57-919E-9031C9D6ED44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED05A966-3889-4D57-919E-9031C9D6ED44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED05A966-3889-4D57-919E-9031C9D6ED44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED05A966-3889-4D57-919E-9031C9D6ED44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C590736B-4A91-4138-A31E-603EA51646C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C590736B-4A91-4138-A31E-603EA51646C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C590736B-4A91-4138-A31E-603EA51646C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C590736B-4A91-4138-A31E-603EA51646C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52E29B7C-EBB0-428C-A826-C10B3E478C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52E29B7C-EBB0-428C-A826-C10B3E478C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52E29B7C-EBB0-428C-A826-C10B3E478C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52E29B7C-EBB0-428C-A826-C10B3E478C2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{701AF0B0-6952-4AD2-9115-76B2B5CC9C93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{701AF0B0-6952-4AD2-9115-76B2B5CC9C93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{701AF0B0-6952-4AD2-9115-76B2B5CC9C93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{701AF0B0-6952-4AD2-9115-76B2B5CC9C93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C319F2C-8422-48F5-950E-C43E2049D502}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C319F2C-8422-48F5-950E-C43E2049D502}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C319F2C-8422-48F5-950E-C43E2049D502}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C319F2C-8422-48F5-950E-C43E2049D502}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E41AB652-D850-494E-998C-D07B721EDD87}
+		VisualSVNWorkingCopyRoot = .
+	EndGlobalSection
+EndGlobal

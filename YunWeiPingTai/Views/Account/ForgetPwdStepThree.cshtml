@@ -1,0 +1,248 @@
+﻿
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html id="extr-page">
+<head>
+    <meta charset="utf-8">
+    <title> 阳光数码运维平台</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- #CSS Links -->
+    <!-- Basic Styles -->
+    <link rel="stylesheet" type="text/css" media="screen" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="~/css/font-awesome.min.css">
+
+    <!-- SmartAdmin Styles : Caution! DO NOT change the order -->
+    <link rel="stylesheet" type="text/css" media="screen" href="~/css/smartadmin-production-plugins.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="~/css/smartadmin-production.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="~/css/smartadmin-skins.min.css">
+
+    <!-- SmartAdmin RTL Support -->
+    <link rel="stylesheet" type="text/css" media="screen" href="~/css/smartadmin-rtl.min.css">
+
+    <!-- We recommend you use "your_style.css" to override SmartAdmin
+         specific styles this will also ensure you retrain your customization with each SmartAdmin update.
+    <link rel="stylesheet" type="text/css" media="screen" href="css/your_style.css"> -->
+    <!-- Demo purpose only: goes with demo.js, you can delete this css when designing your own WebApp -->
+    <link rel="stylesheet" type="text/css" media="screen" href="~/css/demo.min.css">
+
+    <!-- #FAVICONS -->
+    <link rel="shortcut icon" href="~/img/favicon/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="~/img/favicon/favicon.ico" type="image/x-icon">
+
+    <!-- #GOOGLE FONT -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,300,400,700">
+    <!--消息提示 toastr-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <style>
+        .error {
+            color: red
+        }
+    </style>
+
+</head>
+
+<body class="animated fadeInDown">
+
+    <header id="header">
+
+        <div id="logo-group">
+            <span id="logo"> <img src="~/img/logo.png" alt="SmartAdmin"> </span>
+        </div>
+
+        <span id="extr-page-header-space"> <span class="hidden-mobile hiddex-xs">没有账号?</span> <a href="/Account/Register" class="btn btn-danger">去注册</a> </span>
+
+    </header>
+
+    <div id="main" role="main">
+
+        <!-- MAIN CONTENT -->
+        <div id="content" class="container">
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 hidden-xs hidden-sm">
+                    <h1 class="txt-color-red login-header-big">运维平台</h1>
+                    <div class="hero">
+
+                        <div class="pull-left login-desc-box-l">
+                            <h4 class="paragraph-header">山东阳光数码科技有限公司运维管理平台，轻轻松松完成日志上报。</h4>
+                            @*<div class="login-app-icons">
+                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm">Frontend Template</a>
+                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm">Find out more</a>
+                                </div>*@
+                        </div>
+
+                        <img src="~/img/demo/iphoneview.png" class="pull-right display-image" alt="" style="width:210px">
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                            <h5 class="about-heading">阳光数码新闻一</h5>
+                            <p>
+                                山东阳光数码科技有限公司成立于1988年。
+                            </p>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                            <h5 class="about-heading">阳光数码新闻二</h5>
+                            <p>
+                                为加强公司企业文化建设，丰富员工的文化生活，进一步增强团队凝聚力，体现公司的人文气息，秉承“快乐工作，幸福生活”的活动精神......
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                    <div class="well no-padding">
+                        <form action="" id="changePwd-form" class="smart-form client-form">
+                            <header>
+                                忘记密码
+                            </header>
+
+                            <fieldset>
+                                <section>
+                                    <label class="input">
+                                        <i class="icon-append fa fa-user"></i>
+                                        <input type="password" name="password" placeholder="新密码" id="password">
+                                        <b class="tooltip tooltip-top-right">
+                                            <i class="fa fa-user txt-color-teal"></i> 请输入密码
+                                        </b>
+                                    </label>
+                                </section>
+                                <section>
+                                    <label class="input">
+                                        <i class="icon-append fa fa-user"></i>
+                                        <input type="password" name="passwordConfirm" placeholder="确认新密码">
+                                        <b class="tooltip tooltip-top-right">
+                                            <i class="fa fa-user txt-color-teal"></i> 请输入确认密码
+                                        </b>
+                                    </label>
+                                </section>
+
+                            </fieldset>
+                            <footer>
+                                <button type="submit" class="btn btn-primary" id="btnSave">
+                                    保存
+                                </button>
+                            </footer>
+                        </form>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!--================================================== -->
+    <!-- PACE LOADER - turn this on if you want ajax loading to show (caution: uses lots of memory on iDevices)-->
+    <script src="~/js/plugin/pace/pace.min.js"></script>
+
+    <!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
+
+    <script src="~/js/libs/jquery-3.2.1.min.js"></script>
+
+    <script src="~/js/libs/jquery-ui-1.12.1.min.js"></script>
+
+    <!-- IMPORTANT: APP CONFIG -->
+    <script src="~/js/app.config.js"></script>
+
+    <!-- JS TOUCH : include this plugin for mobile drag / drop touch events
+    <script src="js/plugin/jquery-touch/jquery.ui.touch-punch.min.js"></script> -->
+    <!-- BOOTSTRAP JS -->
+    <script src="~/js/bootstrap/bootstrap.min.js"></script>
+
+    <!-- JQUERY VALIDATE -->
+    <script src="~/js/plugin/jquery-validate/jquery.validate.min.js"></script>
+
+    <!-- JQUERY MASKED INPUT -->
+    <script src="~/js/plugin/masked-input/jquery.maskedinput.min.js"></script>
+
+    <!--[if IE 8]>
+
+        <h1>Your browser is out of date, please update your browser by going to www.microsoft.com/download</h1>
+
+    <![endif]-->
+    <!-- MAIN APP JS FILE -->
+    <script src="~/js/app.min.js"></script>
+    <!--消息提示 toastr-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+        runAllForms();
+
+        $(function () {
+            //toastr
+            toastr.options = {
+                positionClass:"toast-top-center",
+            };
+
+
+            // Validation
+            $("#changePwd-form").validate({
+                //通过验证后执行的方法
+                submitHandler: function (form) {
+                    var formData = $("#changePwd-form").serializeArray();
+                    $.ajax({
+                        url: "/Account/ForgetPwdStepThree",
+                        type: "POST",
+                        dataType: "json",
+                        data: formData,
+                        success: function (res) {
+                            if (res.status == "ok") {
+                                toastr.success("密码修改成功，请登录");
+                                location.href = "/Account/Login";
+                            }
+                            else {
+                                toastr.warning("错误:"+res.errorMsg);
+                                location.href="/Account/ForgetPwdStepOne";
+                            }
+                        },
+                        error: function (res) {
+                            toastr.error("网络连接异常");
+                            location.reload();
+                        }
+                    });
+                },
+
+                // 验证规则
+                rules: {
+                    password : {
+                        required : true,
+                        minlength : 6,
+                        maxlength : 20
+                    },
+                    passwordConfirm : {
+                        required : true,
+                        minlength : 6,
+                        maxlength : 20,
+                        equalTo : '#password'
+                    }
+                },
+
+                // 验证消息
+                messages: {
+                    password : {
+                        required : '请输入密码'
+                    },
+                    passwordConfirm : {
+                        required : '请输入确认密码',
+                        equalTo : '两次输入密码需一致'
+                    }
+                },
+
+                // Do not change code below
+                errorPlacement: function (error, element) {
+                    error.insertBefore(element.parent().parent());
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

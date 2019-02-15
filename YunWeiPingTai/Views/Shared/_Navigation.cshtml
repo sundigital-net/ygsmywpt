@@ -1,0 +1,97 @@
+
+<!-- Left panel : Navigation area -->
+<!-- Note: This width of the aside area can be adjusted through LESS variables -->
+<aside id="left-panel">
+    <!-- User info -->
+    <div class="login-info">
+        <span>
+            <!-- User image size is adjusted inside CSS, it should stay as it -->
+            <a href="#" >
+                <img src="~/img/avatars/sunny.png" alt="me" class="online" />
+                <span>@User.Claims.SingleOrDefault(t=>t.Type== ClaimTypes.Name).Value</span>
+            </a>
+        </span>
+    </div>
+    <!-- end user info -->
+    <!-- NAVIGATION : This navigation is also responsive-->
+    <nav>
+        <!--
+        NOTE: Notice the gaps after each icon usage <i></i>..
+        Please note that these links work a bit different than
+        traditional href="" links. See documentation for details.
+        -->
+
+        <ul>
+            <li is-active-route asp-controller="Home">
+                <a href="#" title="首页">
+                    <i class="fa fa-lg fa-fw fa-home"></i> <span class="menu-item-parent">首页</span>
+                </a>
+            </li>
+            <li is-active-route asp-controller="User">
+                <a href="#">
+                    <i class="fa fa-lg fa-fw fa-user"></i> <span class="menu-item-parent">用户管理</span>
+                </a>
+                <ul>
+                    <li is-active-route asp-controller="User" asp-action="NewList">
+                        <a asp-controller="User" asp-action="NewList">审核用户</a>
+                    </li>
+                    <li is-active-route asp-controller="User" asp-action="List">
+                        <a asp-controller="User" asp-action="List">用户列表</a>
+                    </li>
+
+                </ul>
+            </li>
+            <li is-active-route asp-controller="WorkLog" asp-action="List">
+                <a asp-controller="WorkLog" asp-action="List">
+                    <i class="fa fa-lg fa-fw fa-inbox"></i> <span class="menu-item-parent">工作日志</span>
+                </a>
+            </li>
+            <li is-active-route asp-controller="Unit">
+                <a href="#">
+                    <i class="fa fa-lg fa-fw fa-bar-chart-o"></i> <span class="menu-item-parent">单位管理</span>
+                </a>
+                <ul>
+                    <li is-active-route asp-controller="Unit" asp-action="List">
+                        <a asp-controller="Unit" asp-action="List">单位列表</a>
+                    </li>
+                    <li is-active-route asp-controller="Graphs" asp-action="MorrisCharts">
+                        <a asp-controller="Graphs" asp-action="MorrisCharts">Morris Charts</a>
+                    </li>
+                    <li is-active-route asp-controller="Graphs" asp-action="Sparklines">
+                        <a asp-controller="Graphs" asp-action="Sparklines">Sparklines</a>
+                    </li>
+                    <li is-active-route asp-controller="Graphs" asp-action="EasyPieCharts">
+                        <a asp-controller="Graphs" asp-action="EasyPieCharts">EasyPieCharts</a>
+                    </li>
+                    <li is-active-route asp-controller="Graphs" asp-action="Dygraphs">
+                        <a asp-controller="Graphs" asp-action="Dygraphs">Dygraphs</a>
+                    </li>
+                </ul>
+            </li>
+            <li is-active-route asp-controller="Graphs">
+                <a href="#">
+                    <i class="fa fa-lg fa-fw fa-bar-chart-o"></i> <span class="menu-item-parent">Graphs</span>
+                </a>
+                <ul>
+                    <li is-active-route asp-controller="Graphs" asp-action="FlotChart">
+                        <a asp-controller="Graphs" asp-action="FlotChart">Flot Chart</a>
+                    </li>
+                    <li is-active-route asp-controller="Graphs" asp-action="MorrisCharts">
+                        <a asp-controller="Graphs" asp-action="MorrisCharts">Morris Charts</a>
+                    </li>
+                    <li is-active-route asp-controller="Graphs" asp-action="Sparklines">
+                        <a asp-controller="Graphs" asp-action="Sparklines">Sparklines</a>
+                    </li>
+                    <li is-active-route asp-controller="Graphs" asp-action="EasyPieCharts">
+                        <a asp-controller="Graphs" asp-action="EasyPieCharts">EasyPieCharts</a>
+                    </li>
+                    <li is-active-route asp-controller="Graphs" asp-action="Dygraphs">
+                        <a asp-controller="Graphs" asp-action="Dygraphs">Dygraphs</a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    </nav>
+</aside>
+<!-- END NAVIGATION -->
