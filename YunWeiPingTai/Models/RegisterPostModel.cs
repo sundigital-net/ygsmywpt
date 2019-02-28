@@ -13,6 +13,7 @@ namespace YunWeiPingTai.Models
         public string Name { get; set; }
 
         [Required(ErrorMessage ="{0}必填.")]
+        [DataType(DataType.EmailAddress)]
         [EmailAddress(ErrorMessage ="请填写正确格式的电子邮箱.")]
         [Display(Name = "电子邮箱")]
         public string Email { get; set; }
@@ -31,15 +32,15 @@ namespace YunWeiPingTai.Models
         [Display(Name="确认密码")]
         [DataType(DataType.Password)]
         [Required(ErrorMessage = "{0}必填.")]
-        [Compare("Password",ErrorMessage ="两次输入的密码不一致.")]
+        [Compare(nameof(Password),ErrorMessage ="两次输入的密码不一致.")]
         public string PasswordConfirm { get; set; }
 
         [Display(Name="验证码")]
         [Required(ErrorMessage = "{0}必填.")]
         public string Captcha { get; set; }
-
+        /*
         [Display(Name ="账号类型")]
         [Required(ErrorMessage ="{0}必填.")]
-        public int Role { get; set; }
+        public int Role { get; set; }*/
     }
 }

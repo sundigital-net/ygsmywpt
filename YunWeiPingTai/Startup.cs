@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using YunWeiPingTai.Configuration;
+using YunWeiPingTai.Custom;
 using YunWeiPingTai.DTO;
 using YunWeiPingTai.IService;
 using YunWeiPingTai.Models;
@@ -58,7 +60,45 @@ namespace YunWeiPingTai
             #endregion
 
             # region 添加Identity服务和所有依赖相关的服务
-            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<MyDbContext>();
+            services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(connectionstr,b=>b.MigrationsAssembly(nameof(YunWeiPingTai))));
+            services.AddDefaultIdentity<IdentityUser>()
+                .AddUserValidator<MyUserValidator<IdentityUser>>()//添加自定义的用户验证器,中文
+                .AddEntityFrameworkStores<IdentityDbContext>();
+
+            //移除默认的验证器,必须添加到AddDefaultIdentity之后
+            var service = services.FirstOrDefault(t => t.ImplementationType == typeof(UserValidator<IdentityUser>));
+            if (service != null)
+            {
+                services.Remove(service);
+            }
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                //密码
+                options.Password.RequireDigit = true;//数字
+                options.Password.RequireLowercase = true;//小写
+                options.Password.RequireNonAlphanumeric = false;//特殊字符
+                options.Password.RequireUppercase = false;//大写
+                options.Password.RequiredLength = 8;//最小长度
+
+                // 锁定设置
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);//账户锁定时长30分钟
+                options.Lockout.MaxFailedAccessAttempts = 5;//5次失败的尝试将账户锁定
+
+                //User设置
+                //options.User.AllowedUserNameCharacters =
+               //     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+                options.User.RequireUniqueEmail = true;//邮箱唯一
+                options.User.AllowedUserNameCharacters =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789{中}";
+
+
+                // Cookie常用设置
+                //options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(150);//Cookie 保持有效的时间150天。
+                //options.Cookies.ApplicationCookie.LoginPath = "/Account/LogIn";//在进行登录时自动重定向。
+                //options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";//在进行注销时自动重定向。
+            });
+
             #endregion
 
             #region 配置redisCache并注册

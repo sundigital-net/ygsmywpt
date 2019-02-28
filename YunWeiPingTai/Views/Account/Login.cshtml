@@ -1,4 +1,4 @@
-﻿@model LoginViewModel
+﻿@model LoginPostModel
 @{
     Layout = null;
 }
@@ -21,107 +21,29 @@
 <form class="layui-form" id="login-form">
     <div class="login_face"><img src="~/images/face.jpg" class="userAvatar"></div>
     <div class="layui-form-item input-item">
-        <label for="userName">用户名</label>
-        <input type="text" placeholder="请输入用户名" autocomplete="off" name="account" id="account" class="layui-input" lay-verify="required">
+        <label asp-for="Email">邮箱</label>
+        <input type="text" placeholder="请输入邮箱" autocomplete="off" asp-for="Email" class="layui-input" lay-verify="email">
     </div>
     <div class="layui-form-item input-item">
-        <label for="password">密码</label>
-        <input type="password" placeholder="请输入密码" autocomplete="off" name="password" id="password" class="layui-input" lay-verify="required">
+        <label asp-for="Password">密码</label>
+        <input type="password" placeholder="请输入密码" autocomplete="off" asp-for="Password" class="layui-input" lay-verify="required">
     </div>
     <div class="layui-form-item input-item" id="imgCode">
-        <label for="code">验证码</label>
-        <input type="text" placeholder="请输入验证码" autocomplete="off" name="captcha" id="captcha" class="layui-input">
+        <label asp-for="Captcha">验证码</label>
+        <input type="text" placeholder="请输入验证码" autocomplete="off" asp-for="Captcha" class="layui-input" lay-verify="required">
         <img src="" id="loginCaptcha">
     </div>
+    <div asp-validation-summary="All"></div>
     <div class="layui-form-item">
         <button class="layui-btn layui-block" lay-filter="login" lay-submit>登录</button>
     </div>
-        
+    <div class="layui-form-item layui-row">
+        <a href="@Url.Action("Register","Account")">去注册</a>
+    </div>
 </form>
 <script type="text/javascript" src="~/layui/layui.js"></script>
 <script type="text/javascript" src="~/js/login.js"></script>
 <script type="text/javascript" src="~/js/cache.js"></script>
-
-<script>
-    
-    $(function () {
-        
-
-        //验证码
-        $("#loginCaptcha").click(function () {
-            $("#loginCaptcha").attr("src", "/Account/GetCaptcha?t=" + Math.random());
-        });
-        $("#loginCaptcha").click();//避免部分浏览器刚打开时加载上次的缓存验证码
-
-
-
-        // Validation
-        $("#login-form").validate({
-            //通过验证后执行的方法
-            submitHandler: function (form) {
-                //toastr.success("hahahaha");
-                //return;
-                var formData = $("#login-form").serializeArray();
-                $.ajax({
-                    url: "/Account/Login",
-                    type: "POST",
-                    dataType: "json",
-                    data: formData,
-                    success: function (res) {
-                        if (res.status == "ok") {
-                            toastr.success("登录成功");
-                            location.href = "/Home/Index";
-                        }
-                        else {
-                            toastr.warning(res.errorMsg);
-                            //location.reload();
-                            $("#loginCaptcha").click();
-                        }
-                    },
-                    error: function (res) {
-                        toastr.error("网络连接异常");
-                        //location.reload();
-                        $("#loginCaptcha").click();
-                    }
-                });
-            },
-
-            // 验证规则
-            rules: {
-                account: {
-                    required: true,
-                },
-                password: {
-                    required: true,
-                    minlength: 6,
-                    maxlength: 20
-                },
-                captcha: {
-                    required: true,
-                }
-            },
-
-            // 验证消息
-            messages: {
-                account: {
-                    required: '请输入账号'
-                },
-                password: {
-                    required: '请输入密码'
-                },
-                captcha: {
-                    required: '请输入验证码'
-                }
-            },
-
-            // Do not change code below
-            errorPlacement: function (error, element) {
-                error.insertBefore(element.parent().parent());
-            }
-        });
-    });
-    
-</script>
 
 </body>
 </html>

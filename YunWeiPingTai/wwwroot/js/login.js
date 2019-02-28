@@ -6,11 +6,44 @@ layui.use(['form','layer','jquery'],function(){
    
 
     //登录按钮
-    form.on("submit(login)",function(data){
-        $(this).text("登录中...").attr("disabled","disabled").addClass("layui-disabled");
-        setTimeout(function(){
-            window.location.href = "/layuicms2.0";
-        },1000);
+    form.on("submit(login)", function (data) {
+        var btn = $(this);
+        btn.text("登录中...").attr("disabled", "disabled").addClass("layui-disabled");
+        //登录过程
+
+        var formData = $("#login-form").serializeArray();
+        $.ajax({
+            url: "/Account/Login",
+            type: "POST",
+            dataType: "json",
+            data: formData,
+            success: function (res) {
+                if (res.status == "ok") {
+                    layer.msg("登录成功");
+                    setTimeout(function () {
+                        window.location.href = "/Home/Index";
+                    }, 1000);
+                    //location.href = "/Home/Index";
+                }
+                else {
+                    layer.msg(res.errorMsg);
+                    //location.reload();
+                    $("#loginCaptcha").click();
+                    btn.text("登录").removeClass("layui-disabled").removeAttr("disabled");
+                }
+            },
+            error: function (res) {
+                layer.msg("网络连接异常");
+                //location.reload();
+                $("#loginCaptcha").click();
+                btn.text("登录").removeClass("layui-disabled").removeAttr("disabled");
+            }
+        });
+
+
+        /*setTimeout(function(){
+            window.location.href = "/Home/Index";
+        },1000);*/
         return false;
     })
 

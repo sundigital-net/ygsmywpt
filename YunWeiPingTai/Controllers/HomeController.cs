@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using YunWeiPingTai.Configuration;
 using YunWeiPingTai.IService;
 using YunWeiPingTai.Models;
 
 namespace YunWeiPingTai.Controllers
 {
-    
+    [UserAuthorize]
     public class HomeController : Controller
     {
         private readonly IUserService _userSvc;

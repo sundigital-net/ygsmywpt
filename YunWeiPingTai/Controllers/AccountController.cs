@@ -25,12 +25,12 @@ namespace YunWeiPingTai.Controllers
         private readonly IUserService _userSvc;
         private readonly ILogger<AccountController> _logger;
         private readonly IOptions<EmailSettings> _options;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public AccountController(UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager, 
-            IUserService userSvc,IEmailSender emailSender, 
+        public AccountController(UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            IUserService userSvc, IEmailSender emailSender,
             ILogger<AccountController> logger,
             IOptions<EmailSettings> options)
         {
@@ -43,8 +43,9 @@ namespace YunWeiPingTai.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login(string returnUrl=null)
+        public IActionResult Login(string returnUrl = null)
         {
+            /*
             //获取cookie中用户信息
             var adminAccount =HttpContext.User.Claims.SingleOrDefault(t=>t.Type=="Account");
             string account = adminAccount == null ? "" : adminAccount.Value;
@@ -59,11 +60,12 @@ namespace YunWeiPingTai.Controllers
             model.Account = model.RememberMe?account:"";
             model.Password = model.RememberMe? pwd:"";
             ViewData["ReturnUrl"] = returnUrl;
-            return View(model);
+            return View(model);*/
+            return View();
         }
 
         [HttpPost]
-        public IActionResult Login(LoginPostModel model)
+        public async Task<IActionResult> Login(LoginPostModel model)
         {
             //ViewData["ReturnUrl"] = returnUrl;
             if (!ModelState.IsValid)
@@ -76,6 +78,28 @@ namespace YunWeiPingTai.Controllers
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "验证码错误。" });
             }
+            //账号密码的验证
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null)
+            {
+                var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe,
+                    lockoutOnFailure: true);
+                if (result.Succeeded) //密码验证成功
+                {
+                    _logger.LogInformation("User login:"+user.Email);
+                    return Json(new AjaxResult {Status = "ok"});
+                }
+
+                if (result.IsLockedOut) //用户锁定
+                {
+                    _logger.LogWarning("User locked:"+user.Email);
+                    return Json(new AjaxResult() {Status = "error", ErrorMsg = "用户已被锁定"});
+                }
+            }
+            return Json(new AjaxResult { Status = "error", ErrorMsg = "用户名/密码错误" });
+
+
+            /*
             //账号密码
             var login = _userSvc.CheckLogin(model.Account, model.Password);
             if (!login)
@@ -90,7 +114,7 @@ namespace YunWeiPingTai.Controllers
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "该账号未通过审核，请等待" });
             }
-
+            */
             /*
             HttpContext.Session.SetString(UserAuthorizeAttribute.UserAuthenticationScheme, user.Id.ToString());
             
@@ -116,7 +140,7 @@ namespace YunWeiPingTai.Controllers
                 AllowRefresh=false,
             });
             */
-            return Json(new AjaxResult { Status = "ok" });
+
         }
 
         [HttpGet]
@@ -126,9 +150,9 @@ namespace YunWeiPingTai.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(RegisterPostModel model)
+        public async Task<IActionResult> Register(RegisterPostModel model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = MvcHelper.GetValidMsg(ModelState) });
             }
@@ -138,15 +162,38 @@ namespace YunWeiPingTai.Controllers
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "验证码错误。" });
             }
+
             //注册
-            var id= _userSvc.AddNew(model.PhoneNum, model.Email, model.Name, model.Password);
+
+            var user=new IdentityUser()
+            {
+                UserName = model.Name,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNum,
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)//成功
+            {
+                await _signInManager.SignInAsync(user, isPersistent: false);//注册成功并登录
+                return Json(new AjaxResult() {Status = "ok"});
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty,error.Description);
+            }
+
+            return Json(new AjaxResult() {Status = "error", ErrorMsg = MvcHelper.GetValidMsg(ModelState)});
+            /*
+            var id = _userSvc.AddNew(model.PhoneNum, model.Email, model.Name, model.Password);
             if (id == -1)
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "电子邮箱或者手机号已经存在。" });
             }
-            return Json(new AjaxResult { Status = "ok" });
+            return Json(new AjaxResult { Status = "ok" });*/
         }
 
+        #region 账号唯一性验证，暂不用
         [HttpPost]
         public IActionResult Validate(string account)
         {
@@ -156,13 +203,14 @@ namespace YunWeiPingTai.Controllers
             else
                 return Content("false");
         }
+        #endregion
 
         public IActionResult GetCaptcha()
         {
             try
             {
                 //创建字符串并保存到TempData
-                var code = VerifyCodeHelper.GetSingleObj().CreateVerifyCode(VerifyCodeHelper.VerifyCodeType.MixVerifyCode, 4);
+                var code = VerifyCodeHelper.GetSingleObj().CreateVerifyCode(VerifyCodeHelper.VerifyCodeType.AbcVerifyCode, 4);
                 TempData["CaptchaStr"] = code;
                 //生成img
                 var codeImg = VerifyCodeHelper.GetSingleObj().CreateByteByImgVerifyCode(code, 90, 36);
@@ -178,8 +226,9 @@ namespace YunWeiPingTai.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(UserAuthorizeAttribute.UserAuthenticationScheme);
-            HttpContext.Session.Clear();
+            await _signInManager.SignOutAsync();
+            //await HttpContext.SignOutAsync(UserAuthorizeAttribute.UserAuthenticationScheme);
+            //HttpContext.Session.Clear();
             return RedirectToAction(nameof(AccountController.Login));
         }
 
@@ -194,7 +243,7 @@ namespace YunWeiPingTai.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return Json(new AjaxResult() {Status = "error", ErrorMsg = MvcHelper.GetValidMsg(ModelState)});
+                return Json(new AjaxResult() { Status = "error", ErrorMsg = MvcHelper.GetValidMsg(ModelState) });
             }
             //验证码
             var serverCaptcha = (string)TempData["CaptchaStr"];
@@ -219,14 +268,14 @@ namespace YunWeiPingTai.Controllers
                 TempData["Account"] = model.Account;
                 await _emailSender.SendEmailAsync(model.Account, EmailType.Captcha, $"验证码：{code}，请在5分钟内验证。如非本人操作，请忽略。");
                 //sender.SendEmail(model.Account, EmailType.Captcha, $"验证码：{code}，请在5分钟内验证。如非本人操作，请忽略。");
-                _logger.LogInformation("邮件发送：To"+ model.Account+"，类型："+EmailType.Captcha);
+                _logger.LogInformation("邮件发送：To" + model.Account + "，类型：" + EmailType.Captcha);
             }
             catch (Exception e)
             {
-                _logger.LogError("邮箱验证码发送失败",e);
-                return Json(new AjaxResult { Status = "error",ErrorMsg = "邮箱验证码发送失败"});
+                _logger.LogError("邮箱验证码发送失败", e);
+                return Json(new AjaxResult { Status = "error", ErrorMsg = "邮箱验证码发送失败" });
             }
-            return Json(new AjaxResult{Status = "ok"});
+            return Json(new AjaxResult { Status = "ok" });
         }
 
         [HttpGet]
@@ -240,16 +289,16 @@ namespace YunWeiPingTai.Controllers
         {
             if (string.IsNullOrEmpty(emailCaptcha))
             {
-                return Json(new AjaxResult {Status = "error", ErrorMsg = "邮箱验证码必填"});
+                return Json(new AjaxResult { Status = "error", ErrorMsg = "邮箱验证码必填" });
             }
             //验证
-            var serverCaptha = (string) TempData["PwdForgetCaptcha"];
+            var serverCaptha = (string)TempData["PwdForgetCaptcha"];
             if (string.IsNullOrEmpty(serverCaptha) || serverCaptha.Trim() != emailCaptcha.Trim())
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "邮箱验证码错误，请重新发送" });
             }
 
-            return Json(new AjaxResult() {Status = "ok"});
+            return Json(new AjaxResult() { Status = "ok" });
         }
 
         [HttpGet]
@@ -266,13 +315,13 @@ namespace YunWeiPingTai.Controllers
                 return Json(new AjaxResult() { Status = "error", ErrorMsg = MvcHelper.GetValidMsg(ModelState) });
             }
 
-            var account = (string) TempData["Account"];
+            var account = (string)TempData["Account"];
             if (string.IsNullOrEmpty(account))
             {
-                return Json(new AjaxResult() {Status = "error", ErrorMsg = "账号信息查找失败"});
+                return Json(new AjaxResult() { Status = "error", ErrorMsg = "账号信息查找失败" });
             }
-            _userSvc.ChangePwd(account,model.Password);
-            return Json(new AjaxResult() {Status = "ok"});
+            _userSvc.ChangePwd(account, model.Password);
+            return Json(new AjaxResult() { Status = "ok" });
         }
 
         [HttpGet]
