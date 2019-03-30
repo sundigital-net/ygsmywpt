@@ -7,8 +7,13 @@ namespace YunWeiPingTai.IService
 {
     public interface IUnitService:IServiceSupport
     {
-        long AddNew(string name, string address, string linkMan, string tel, string phoneNum);
-        UnitDTO[] GetAll();
+        long AddOrEdit(long id,string name, string address, string linkMan, string tel, string phoneNum);
+        List<UnitDTO> GetAll();
         UnitDTO GetById(long id);
+        void UnitDel(long unitId);
+        UnitDeviceDTO GetUnitDevice(long id);
+        List<UnitDeviceDTO> GetByUnitId(long unitId);
+        long AddOrEdit(long unitId, long deviceId, long userId,string snCode);
+        void UnitDeviceDel(long unitDeviceId);
     }
 }

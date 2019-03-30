@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace YunWeiPingTai.Models
 {
-    public class UnitAddPostModel
+    public class UnitAddEditPostModel
     {
+        public long Id { get; set; }
+
         [Display(Name = "单位名称")]
         [Required(ErrorMessage = "{0}是必填项")]
         public string Name { get; set; }

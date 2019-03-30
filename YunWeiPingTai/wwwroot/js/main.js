@@ -19,8 +19,8 @@ function getLangDate(){
     var second = dateObj.getSeconds(); //当前系统时间的秒钟值
     var timeValue = "" +((hour >= 12) ? (hour >= 18) ? "晚上" : "下午" : "上午" ); //当前时间属于上午、晚上还是下午
     newDate = dateFilter(year)+"年"+dateFilter(month)+"月"+dateFilter(date)+"日 "+" "+dateFilter(hour)+":"+dateFilter(minute)+":"+dateFilter(second);
-    document.getElementById("nowTime").innerHTML = "亲爱的用户，"+timeValue+"好！ 欢迎使用运维平台1.0模版。当前时间为： "+newDate+"　"+week;
-    setTimeout("getLangDate()",1000);
+    document.getElementById("nowTime").innerHTML = "亲爱的用户，"+timeValue+"好！ 欢迎使用运维平台1.0版。当前时间为： "+newDate+"　"+week;
+    //setTimeout("getLangDate()",1000);
 }
 
 layui.use(['form','element','layer','jquery'],function(){
@@ -86,9 +86,10 @@ layui.use(['form','element','layer','jquery'],function(){
     })
 
     //用户数量
-    $.get("../json/userList.json",function(data){
-        $(".userAll span").text(data.count);
-    })
+    //$.get("../User/LoadData",
+    //    function(data) {
+    //        $(".userAll span").text(data.count);
+    //    });
 
     //外部图标
     $.get(iconUrl,function(data){

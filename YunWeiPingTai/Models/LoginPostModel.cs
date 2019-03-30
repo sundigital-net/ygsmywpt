@@ -10,8 +10,7 @@ namespace YunWeiPingTai.Models
     {
         [Display(Name = "账号")]
         [Required(ErrorMessage = "{0}是必填项")]
-        [EmailAddress(ErrorMessage = "请填写正确格式的电子邮箱.")]
-        public string Email { get; set; }
+        public string Account { get; set; }
         [Display(Name = "密码")]
         [Required(ErrorMessage = "{0}是必填项")]
         [DataType(DataType.Password)]

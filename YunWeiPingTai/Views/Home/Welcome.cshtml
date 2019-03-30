@@ -8,7 +8,7 @@
 </blockquote>
 <div class="layui-row layui-col-space10 panel_box">
     <div class="panel layui-col-xs12 layui-col-sm6 layui-col-md4 layui-col-lg2">
-        <a href="javascript:;" data-url="https://www.cnblogs.com/yilezhu/p/9977862.html" target="_blank">
+        <a href="javascript:;" data-url="#" target="_blank">
             <div class="panel_icon layui-bg-green">
                 <i class="layui-anim seraph icon-good"></i>
             </div>
@@ -46,7 +46,7 @@
                 <i class="layui-anim seraph icon-icon10" data-icon="icon-icon10"></i>
             </div>
             <div class="panel_word userAll">
-                <span>100</span>
+                <span>@ViewData["UserCount"]</span>
                 <em>用户总数</em>
                 <cite class="layui-hide">用户中心</cite>
             </div>
@@ -77,8 +77,8 @@
     </div>
 </div>
 <blockquote class="layui-elem-quote main_btn">
-    <p>本CMS系统基于ASP.NET Core2.2+AutoFac+AutoMap+ FluentValidation +Dapper+LayUI+Redis+SqlServer实现，并采用Layui以及LayuiCMS2.0的后台模板实现。layui开发文档地址：<a class="layui-btn layui-btn-xs layui-btn-danger" target="_blank" href="http://www.layui.com/doc">layui文档</a>　</p>
-    <p>注：本后台模版采用的是开源的LayuiCMS2.0，未引入任何第三方组件，单纯的layui+js实现的各种功能。。</p>
+    <p>本系统基于ASP.NET Core2.2+AutoFac+AutoMap+ FluentValidation +Dapper+LayUI+Redis+SqlServer实现，并采用Layui以及LayuiCMS2.0的后台模板实现。</p>
+    
 </blockquote>
 <div class="layui-row layui-col-space10">
     <div class="layui-col-lg6 layui-col-md12">
@@ -94,29 +94,22 @@
                     <td class="version"></td>
                 </tr>
                 <tr>
-                    <td>开发作者</td>
-                    <td class="author"></td>
-                </tr>
-                <tr>
                     <td>网站首页</td>
                     <td class="homePage"></td>
                 </tr>
                 <tr>
-                    <td>服务器环境</td>
-                    <td class="server"></td>
+                    <td>当前用户</td>
+                    <td class="userName">@ViewData["UserName"]</td>
                 </tr>
                 <tr>
-                    <td>数据库版本</td>
-                    <td class="dataBase"></td>
+                    <td>登录次数</td>
+                    <td class="signinCount">@ViewData["SigninCount"]</td>
                 </tr>
                 <tr>
-                    <td>最大上传限制</td>
-                    <td class="maxUpload"></td>
+                    <td>最后登录IP</td>
+                    <td class="lastSigninIP">@ViewData["LastSigninIP"]</td>
                 </tr>
-                @*<tr>
-                        <td>当前用户权限</td>
-                        <td class="userRights"></td>
-                    </tr>*@
+                
             </tbody>
         </table>
     </div>
@@ -128,16 +121,15 @@
                     <i class="layui-icon layui-timeline-axis">&#xe756;</i>
                     <div class="layui-timeline-content layui-text">
                         <div class="layui-timeline-title">
-                            <h3 class="layui-inline">CzarCms 里程碑版本<span class="layui-red">CzarCms1.0版</span>发布　</h3>
-                            <span class="layui-badge-rim">2019-01-01</span>
+                            <h3 class="layui-inline">里程碑版本<span class="layui-red">运维管理平台1.0版</span>发布　</h3>
+                            <span class="layui-badge-rim">2019-03-10</span>
                         </div>
                         <ul>
-                            <li>
-                                <blockquote class="layui-elem-quote title">全部后台代码完成并发布</blockquote>
+                            <li>全部后台代码完成并发布
                             </li>
-                            <li class="layui-red layedit-tool-help">郑重提示：本系统仅作参考，有很多内容以及功能还在陆续视线中，尽情期待【以后主要侧重组件开发和功能优化，由于能力有限，请大家多多担待】</li>
-                            <li>框架采用最新的ASP.NET Core2.2进行开发，进行源码学习前还请到我的博客查看系列教程对Asp.NET Core进行相应的学习</li>
-                            <li class="layui-blue">由于本人对设计和色差之类的不太感冒，所以后台模板采用开源的LayCms2.0版进行开发，后期考虑升级到Vue</li>
+                            <li class="layui-red layedit-tool-help">郑重提示：本系统仅作参考，有很多内容以及功能还在陆续实现中，敬请期待。</li>
+                            <li>框架采用ASP.NET Core2.2进行开发，欢迎志同道合的朋友一起交流学习。</li>
+                            
 
                         </ul>
                     </div>

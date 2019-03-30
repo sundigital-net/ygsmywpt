@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,14 +13,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
-using YunWeiPingTai.Configuration;
 using YunWeiPingTai.Custom;
-using YunWeiPingTai.DTO;
 using YunWeiPingTai.IService;
 using YunWeiPingTai.Models;
 using YunWeiPingTai.Service;
 using YunWeiPingTai.Services;
-using ApplicationUser = YunWeiPingTai.Service.ApplicationUser;
 
 namespace YunWeiPingTai
 {
@@ -43,13 +41,33 @@ namespace YunWeiPingTai
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            #region 注册cookie
+            #region 防跨站请求（XSRF/CSRF）攻击处理
+
+            services.AddAntiforgery(options =>
+            {
+                options.FormFieldName= "AntiforgeryKey_sundigital";
+                options.HeaderName = "X-CSRF-TOKEN-sundigital";
+                options.SuppressXFrameOptionsHeader = false;
+            });
+
+            #endregion
+
+            #region 注册cookie身份认证服务
             //注册cookie认证服务
-            services.AddAuthentication(UserAuthorizeAttribute.UserAuthenticationScheme)
-                .AddCookie(UserAuthorizeAttribute.UserAuthenticationScheme,options => {
+            services.AddAuthentication(b =>
+                {
+                    b.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    b.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    b.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddCookie(options =>
+                {
                     options.LoginPath = "/Account/Login";
                     options.LogoutPath = "/Account/Logout";
                     options.AccessDeniedPath = new PathString("/Error/Forbidden");//没有权限时跳转页面
+                    options.Cookie.Name = "My_SessionId";//cookie名字
+                    options.Cookie.Expiration=new TimeSpan(0,15,0);
+
                 });
             #endregion
 
@@ -59,12 +77,13 @@ namespace YunWeiPingTai
             services.AddEntityFrameworkSqlServer().AddDbContext<MyDbContext>(t => t.UseSqlServer(connectionstr));
             #endregion
 
-            # region 添加Identity服务和所有依赖相关的服务
-            services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(connectionstr,b=>b.MigrationsAssembly(nameof(YunWeiPingTai))));
+            # region 添加Identity服务和所有依赖相关的服务--停用
+            /*
+            services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(connectionstr, b => b.MigrationsAssembly(nameof(YunWeiPingTai))));
             services.AddDefaultIdentity<IdentityUser>()
                 .AddUserValidator<MyUserValidator<IdentityUser>>()//添加自定义的用户验证器,中文
                 .AddEntityFrameworkStores<IdentityDbContext>();
-
+                
             //移除默认的验证器,必须添加到AddDefaultIdentity之后
             var service = services.FirstOrDefault(t => t.ImplementationType == typeof(UserValidator<IdentityUser>));
             if (service != null)
@@ -87,7 +106,7 @@ namespace YunWeiPingTai
 
                 //User设置
                 //options.User.AllowedUserNameCharacters =
-               //     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+                //     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
                 options.User.RequireUniqueEmail = true;//邮箱唯一
                 options.User.AllowedUserNameCharacters =
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789{中}";
@@ -98,31 +117,34 @@ namespace YunWeiPingTai
                 //options.Cookies.ApplicationCookie.LoginPath = "/Account/LogIn";//在进行登录时自动重定向。
                 //options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";//在进行注销时自动重定向。
             });
-
+            */
             #endregion
 
-            #region 配置redisCache并注册
+            #region 配置redisCache、session并注册
             var redisConn = Configuration["Redis:Connection"];
-            var redisInstanceName= Configuration["Redis:InstanceName"];
+            var redisInstanceName = Configuration["Redis:InstanceName"];
             var sessionOutTime = Configuration.GetValue<int>("SessionTimeOut");
             //配置RedisCache
-            services.AddDistributedRedisCache(options => {
+            services.AddDistributedRedisCache(options =>
+            {
                 options.Configuration = redisConn;
                 options.InstanceName = redisInstanceName;
             });
             //添加session并设置过期时间
-            services.AddSession(options => {
+            services.AddSession(options =>
+            {
                 options.IdleTimeout = TimeSpan.FromMinutes(sessionOutTime);
+                options.Cookie.HttpOnly = true;
             });
             #endregion
 
             #region 注册服务
             //使用反射把所有服务接口进行了注入
             var serviceAsm = Assembly.Load(new AssemblyName("YunWeiPingTai.Service"));
-            foreach(var serviceType in serviceAsm.GetTypes().Where(t=>typeof(IServiceSupport).IsAssignableFrom(t)&&!t.GetTypeInfo().IsAbstract))
+            foreach (var serviceType in serviceAsm.GetTypes().Where(t => typeof(IServiceSupport).IsAssignableFrom(t) && !t.GetTypeInfo().IsAbstract))
             {
                 var interfaceTypes = serviceType.GetInterfaces();
-                foreach(var interfaceType in interfaceTypes)
+                foreach (var interfaceType in interfaceTypes)
                 {
                     services.AddScoped(interfaceType, serviceType);
                 }
@@ -139,7 +161,7 @@ namespace YunWeiPingTai
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,MyDbContext dbContext)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, MyDbContext dbContext)
         {
 
             //向数据库中添加种子数据
@@ -156,7 +178,7 @@ namespace YunWeiPingTai
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-            
+
             app.UseHttpsRedirection();
             app.UseFileServer();//对下面两个中间件的封装
             //app.UseDefaultFiles();//注意写在useStaticFiles之前

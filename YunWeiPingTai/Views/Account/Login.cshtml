@@ -1,4 +1,4 @@
-﻿@model LoginPostModel
+﻿
 @{
     Layout = null;
 }
@@ -18,29 +18,29 @@
     <link rel="stylesheet" href="~/css/public.css" media="all" />
 </head>
 <body class="loginBody">
-<form class="layui-form" id="login-form">
-    <div class="login_face"><img src="~/images/face.jpg" class="userAvatar"></div>
-    <div class="layui-form-item input-item">
-        <label asp-for="Email">邮箱</label>
-        <input type="text" placeholder="请输入邮箱" autocomplete="off" asp-for="Email" class="layui-input" lay-verify="email">
-    </div>
-    <div class="layui-form-item input-item">
-        <label asp-for="Password">密码</label>
-        <input type="password" placeholder="请输入密码" autocomplete="off" asp-for="Password" class="layui-input" lay-verify="required">
-    </div>
-    <div class="layui-form-item input-item" id="imgCode">
-        <label asp-for="Captcha">验证码</label>
-        <input type="text" placeholder="请输入验证码" autocomplete="off" asp-for="Captcha" class="layui-input" lay-verify="required">
-        <img src="" id="loginCaptcha">
-    </div>
-    <div asp-validation-summary="All"></div>
-    <div class="layui-form-item">
-        <button class="layui-btn layui-block" lay-filter="login" lay-submit>登录</button>
-    </div>
-    <div class="layui-form-item layui-row">
-        <a href="@Url.Action("Register","Account")">去注册</a>
-    </div>
-</form>
+    <form class="layui-form" id="login-form">
+        @Html.AntiForgeryToken()
+        <div class="login_face"><img src="~/images/face.jpg" class="userAvatar"></div>
+        <div class="layui-form-item input-item">
+            <label for="Account">账号</label>
+            <input type="text" placeholder="请输入邮箱或手机号" autocomplete="off" name="Account" class="layui-input" lay-verify="required">
+        </div>
+        <div class="layui-form-item input-item">
+            <label for="Password">密码</label>
+            <input type="password" placeholder="请输入密码" autocomplete="off" name="Password" class="layui-input" lay-verify="required">
+        </div>
+        <div class="layui-form-item input-item" id="imgCode">
+            <label for="Captcha">验证码</label>
+            <input type="text" placeholder="请输入验证码" autocomplete="off" name="Captcha" class="layui-input" lay-verify="required|captcha">
+            <img src="" id="loginCaptcha">
+        </div>
+        <div class="layui-form-item">
+            <button class="layui-btn layui-block" lay-filter="login" lay-submit>登录</button>
+        </div>
+        <div class="layui-form-item layui-row">
+            <a href="@Url.Action("Register", "Account")">去注册</a>
+        </div>
+    </form>
 <script type="text/javascript" src="~/layui/layui.js"></script>
 <script type="text/javascript" src="~/js/login.js"></script>
 <script type="text/javascript" src="~/js/cache.js"></script>

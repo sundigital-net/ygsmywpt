@@ -30,7 +30,7 @@ namespace YunWeiPingTai.Controllers
             string userId = serverClaimId == null ? "" : serverClaimId.Value;
             var user = _userSvc.GetUser(Convert.ToInt64(userId));
             List<WorkLogDTO> list = new List<WorkLogDTO>();
-            if (user.Role == UserRoles.Engineer)
+            if (user.RoleId == UserRoles.Engineer)
             {
                 list = _logSvc.GetLogs(user.Id).ToList();
             }

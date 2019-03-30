@@ -27,7 +27,8 @@ namespace YunWeiPingTai.Service
             entity.Name = name;
             entity.Email = email;
             entity.PhoneNum = phoneNum;
-            entity.Status = ShenHeZhuangTai.ShenQing;
+            //entity.Status = ShenHeZhuangTai.ShenQing;
+
             //创建6位随机字符串，作为salt
             string pwdSalt = VerifyCodeHelper.GetSingleObj().CreateVerifyCode(VerifyCodeHelper.VerifyCodeType.MixVerifyCode, 6);
             string pwdHash = CommonHelper.CalcMD5(pwdSalt+password);
@@ -38,16 +39,26 @@ namespace YunWeiPingTai.Service
             return entity.Id;
         }
 
-        public bool CheckLogin(string account, string password)
+        public UserDTO Login(string account, string password,string ip)
         {
+            var dto = new UserDTO();
             var admin = _dbContext.AdminUsers.SingleOrDefault(t => t.PhoneNum == account || t.Email == account);
-            if(admin==null)
+            if(admin!=null)
             {
-                return false;
+                string dbPwdHash = admin.PasswordHash;
+                string adminPwdHash = CommonHelper.CalcMD5(admin.PasswordSalt + password);
+                if (dbPwdHash == adminPwdHash)
+                {
+                    
+                    admin.SigninCount++;
+                    admin.LastSigninTime = DateTime.Now;
+                    admin.LastSigninIP = ip;
+                    _dbContext.SaveChanges();
+                    dto = ToDTO(admin);
+                }
             }
-            string dbPwdHash = admin.PasswordHash;
-            string adminPwdHash = CommonHelper.CalcMD5(admin.PasswordSalt + password);
-            return dbPwdHash == adminPwdHash;
+
+            return dto;
         }
 
         private UserDTO ToDTO(UserEntity entity)
@@ -59,24 +70,10 @@ namespace YunWeiPingTai.Service
             dto.LoginErrorTimes = entity.LoginErrorTimes;
             dto.Name = entity.Name;
             dto.PhoneNum = entity.PhoneNum;
-            dto.Status = entity.Status;
-            switch (entity.Status)
-            {
-                case ShenHeZhuangTai.ShenQing:
-                    dto.StatusName = "待审核";
-                    break;
-                case ShenHeZhuangTai.TongGuo:
-                    dto.StatusName = "正常";
-                    break;
-                case ShenHeZhuangTai.BoHui:
-                    dto.StatusName = "未通过";
-                    break;
-                default:
-                    dto.StatusName = "未知";
-                    break;
-            }
-            dto.Role = entity.Role;
-            switch (entity.Role)
+            dto.IsLock = entity.IsLock;
+            
+            dto.RoleId = entity.RoleId;
+            switch (entity.RoleId)
             {
                 case UserRoles.SuperAdmin:
                     dto.RoleName = "超级管理员";
@@ -92,6 +89,12 @@ namespace YunWeiPingTai.Service
                     break;
             }
             dto.LastLoginErrorDateTime = entity.LastLoginErrorDateTime;
+            dto.SigninCount = entity.SigninCount;
+            dto.LastSigninTime = entity.LastSigninTime;
+            dto.LastSigninTimeStr = entity.LastSigninTime == null
+                ? string.Empty
+                : entity.LastSigninTime.Value.ToString("yyyy-MM-dd HH:mm:ss");
+            dto.LastSigninIP = entity.LastSigninIP;
             return dto;
         }
 
@@ -140,13 +143,13 @@ namespace YunWeiPingTai.Service
             _dbContext.SaveChanges();
         }
 
-        public void UpdateStatus(long id, int status)
+        public void UpdateStatus(long id, bool status)
         {
             var user = _dbContext.AdminUsers.SingleOrDefault(t => t.Id == id);
             if (user == null)
             { throw new ArgumentException("用户信息不存在：id=" + id); }
 
-            user.Status = status;
+            user.IsLock = status;
             _dbContext.SaveChanges();
         }
     }

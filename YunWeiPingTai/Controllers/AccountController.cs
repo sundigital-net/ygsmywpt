@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,17 +27,14 @@ namespace YunWeiPingTai.Controllers
         private readonly IUserService _userSvc;
         private readonly ILogger<AccountController> _logger;
         private readonly IOptions<EmailSettings> _options;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        //private readonly SignInManager<IdentityUser> _signInManager;
+        //private readonly UserManager<IdentityUser> _userManager;
 
-        public AccountController(UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+        public AccountController(
             IUserService userSvc, IEmailSender emailSender,
             ILogger<AccountController> logger,
             IOptions<EmailSettings> options)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
             _userSvc = userSvc;
             _logger = logger;
             _options = options;
@@ -65,81 +64,57 @@ namespace YunWeiPingTai.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginPostModel model)
+        [Route("Account/Login")]
+        public async Task<IActionResult> LoginAsync(LoginPostModel model)
         {
             //ViewData["ReturnUrl"] = returnUrl;
             if (!ModelState.IsValid)
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = MvcHelper.GetValidMsg(ModelState) });
             }
-            //验证码
+
+            #region 验证码
             var serverCaptcha = (string)TempData["CaptchaStr"];
             if (string.IsNullOrEmpty(serverCaptcha) || serverCaptcha.ToLower() != model.Captcha.ToLower())//不区分大小写，一律转换成小写再去比较
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "验证码错误。" });
             }
+            #endregion
             //账号密码的验证
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user != null)
-            {
-                var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe,
-                    lockoutOnFailure: true);
-                if (result.Succeeded) //密码验证成功
-                {
-                    _logger.LogInformation("User login:"+user.Email);
-                    return Json(new AjaxResult {Status = "ok"});
-                }
-
-                if (result.IsLockedOut) //用户锁定
-                {
-                    _logger.LogWarning("User locked:"+user.Email);
-                    return Json(new AjaxResult() {Status = "error", ErrorMsg = "用户已被锁定"});
-                }
-            }
-            return Json(new AjaxResult { Status = "error", ErrorMsg = "用户名/密码错误" });
 
 
-            /*
+            var ip = HttpContext.GetClientUserIp();
+            
             //账号密码
-            var login = _userSvc.CheckLogin(model.Account, model.Password);
-            if (!login)
+            var user = _userSvc.Login(model.Account, model.Password,ip);
+            if (user==null)
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "账号或密码错误。" });
             }
-
-            //记录登录状态
-            var user = _userSvc.GetUser(model.Account);
-            //账号状态
-            if (user.Status != ShenHeZhuangTai.TongGuo)
-            {
-                return Json(new AjaxResult { Status = "error", ErrorMsg = "该账号未通过审核，请等待" });
-            }
-            */
-            /*
-            HttpContext.Session.SetString(UserAuthorizeAttribute.UserAuthenticationScheme, user.Id.ToString());
             
-            //Cookies
-            //创建身份认证Cookie
-            var claimIdentity = new ClaimsIdentity(UserAuthorizeAttribute.UserAuthenticationScheme);
-            claimIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-            claimIdentity.AddClaim(new Claim(ClaimTypes.Name, user.Id.ToString()));
-            claimIdentity.AddClaim(new Claim("Account", model.Account));
-            claimIdentity.AddClaim(new Claim("Password", model.Password));
-            if (model.RememberMe == "on")
+            //账号状态
+            if (user.IsLock)
             {
-                claimIdentity.AddClaim(new Claim("RememberMe", "on"));
+                return Json(new AjaxResult { Status = "error", ErrorMsg = "该账号未审核或已被锁定" });
             }
-            else
+            
+            var claims=new List<Claim>()
             {
-                claimIdentity.AddClaim(new Claim("RememberMe", "off"));
-            }
-            var claimsPrincipal = new ClaimsPrincipal(claimIdentity);
-            HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties {
-                ExpiresUtc = DateTime.Now.AddDays(7),//有效时间1周
-                IsPersistent=true,
-                AllowRefresh=false,
-            });
-            */
+                new Claim(ClaimTypes.Name,user.Name),//姓名
+                new Claim(ClaimTypes.MobilePhone,user.PhoneNum),//手机号
+                new Claim(ClaimTypes.Email,user.Email),//邮箱
+                new Claim(ClaimTypes.Role,user.RoleId.ToString()),//角色
+                new Claim("Id",user.Id.ToString()),
+                new Claim("SigninCount",user.SigninCount.ToString()),
+                new Claim("LastSigninTime",user.LastSigninTimeStr),
+                new Claim("LastSigninIP",user.LastSigninIP)
+            };
+            var claimsIdentity=new ClaimsIdentity(claims,CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
+            
+            return Json(new AjaxResult { Status = "ok" });
 
         }
 
@@ -150,7 +125,7 @@ namespace YunWeiPingTai.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterPostModel model)
+        public IActionResult Register(RegisterPostModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -163,34 +138,13 @@ namespace YunWeiPingTai.Controllers
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "验证码错误。" });
             }
 
-            //注册
-
-            var user=new IdentityUser()
-            {
-                UserName = model.Name,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNum,
-            };
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)//成功
-            {
-                await _signInManager.SignInAsync(user, isPersistent: false);//注册成功并登录
-                return Json(new AjaxResult() {Status = "ok"});
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty,error.Description);
-            }
-
-            return Json(new AjaxResult() {Status = "error", ErrorMsg = MvcHelper.GetValidMsg(ModelState)});
-            /*
+            //
             var id = _userSvc.AddNew(model.PhoneNum, model.Email, model.Name, model.Password);
             if (id == -1)
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "电子邮箱或者手机号已经存在。" });
             }
-            return Json(new AjaxResult { Status = "ok" });*/
+            return Json(new AjaxResult { Status = "ok" });
         }
 
         #region 账号唯一性验证，暂不用
@@ -224,10 +178,11 @@ namespace YunWeiPingTai.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Logout()
+        [Route("Account/Logout")]
+        public async Task<IActionResult> LogoutAsync()
         {
-            await _signInManager.SignOutAsync();
-            //await HttpContext.SignOutAsync(UserAuthorizeAttribute.UserAuthenticationScheme);
+            //await _signInManager.SignOutAsync();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             //HttpContext.Session.Clear();
             return RedirectToAction(nameof(AccountController.Login));
         }
@@ -324,11 +279,6 @@ namespace YunWeiPingTai.Controllers
             return Json(new AjaxResult() { Status = "ok" });
         }
 
-        [HttpGet]
-        public IActionResult ChangePwd()
-        {
-            //修改了一下 Hany
-            return View();
-        }
+        
     }
 }

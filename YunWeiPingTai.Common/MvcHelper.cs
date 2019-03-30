@@ -26,6 +26,20 @@ namespace YunWeiPingTai.Common
             }
             return sb.ToString();
         }
+        /// <summary>
+        /// 获取客户Ip
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static string GetClientUserIp(this HttpContext context)
+        {
+            var ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (string.IsNullOrEmpty(ip))
+            {
+                ip = context.Connection.RemoteIpAddress.ToString();
+            }
+            return ip;
+        }
         public static bool IsAjaxRequest(this HttpRequest request)
         {
             bool result = false;

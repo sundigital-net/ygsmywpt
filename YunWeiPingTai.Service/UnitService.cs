@@ -16,20 +16,45 @@ namespace YunWeiPingTai.Service
         {
             _dbContext = dbContext;
         }
-        public long AddNew(string name, string address, string linkMan, string tel, string phoneNum)
+        public long AddOrEdit(long id,string name, string address, string linkMan, string tel, string phoneNum)
         {
-            //ToDo 单位名称是否需要查重
-            var entity = new UnitEntity()
+            if (id <= 0)
             {
-                Name = name,
-                Address = address,
-                LinkMan = linkMan,
-                Tel = tel,
-                PhoneNum = phoneNum
-            };
-            _dbContext.Units.Add(entity);
-            _dbContext.SaveChanges();
-            return entity.Id;
+                //查重
+                /*
+                var exsit = _dbContext.Units.Any(t => t.Name == name);
+                if (exsit)
+                {
+                    return -1;
+                }*/
+                var entity = new UnitEntity()
+                {
+                    Name = name,
+                    Address = address,
+                    LinkMan = linkMan,
+                    Tel = tel,
+                    PhoneNum = phoneNum
+                };
+                _dbContext.Units.Add(entity);
+                _dbContext.SaveChanges();
+                return entity.Id;
+            }
+            else
+            {
+                var unit = _dbContext.Units.FirstOrDefault(t => t.Id == id);
+                if (unit == null)
+                {
+                    throw new ArgumentException("不存在的单位信息，id="+id);
+                }
+
+                unit.Name = name;
+                unit.Address = address;
+                unit.LinkMan = linkMan;
+                unit.PhoneNum = phoneNum;
+                unit.Tel = tel;
+                _dbContext.SaveChanges();
+                return id;
+            }
         }
 
         private UnitDTO ToDto(UnitEntity entity)
@@ -47,7 +72,7 @@ namespace YunWeiPingTai.Service
             return dto;
         }
 
-        public UnitDTO[] GetAll()
+        public List<UnitDTO> GetAll()
         {
             var units = _dbContext.Units.ToList();
             var list=new List<UnitDTO>();
@@ -56,13 +81,77 @@ namespace YunWeiPingTai.Service
                 list.Add(ToDto(unit));
             }
 
-            return list.ToArray();
+            return list;
         }
 
         public UnitDTO GetById(long id)
         {
             var unit = _dbContext.Units.SingleOrDefault(t => t.Id == id);
             return unit == null ? null : ToDto(unit);
+        }
+
+        public void UnitDel(long unitId)
+        {
+            var unit = _dbContext.Units.SingleOrDefault(t => t.Id == unitId);
+            if (unit == null)
+            { throw new ArgumentException("单位信息不存在：id=" + unitId); }
+
+            unit.IsDeleted = true;
+            _dbContext.SaveChanges();
+        }
+
+        private UnitDeviceDTO ToDto(UnitDeviceEntity entity)
+        {
+            var dto=new UnitDeviceDTO()
+            {
+                AddUserId = entity.AddUserId,
+                AddUserName = entity.AddUser.Name,
+                CreateTime = entity.CreateTime,
+                DeviceId = entity.DeviceId,
+                DeviceName = entity.Device.Name,
+                DeviceVersion = entity.Device.Version,
+                SNCode = entity.SNCode,
+                Id=entity.Id,
+                UnitId = entity.UnitId,
+                UnitName = entity.Unit.Name
+            };
+            return dto;
+        }
+        public UnitDeviceDTO GetUnitDevice(long id)
+        {
+            var unitDevice = _dbContext.UnitDevices.SingleOrDefault(t => t.Id == id);
+            return unitDevice == null ? null : ToDto(unitDevice);
+        }
+
+        public List<UnitDeviceDTO> GetByUnitId(long unitId)
+        {
+            var unitDevices = _dbContext.UnitDevices.Where(t => t.UnitId == unitId).ToList();
+            var list=new List<UnitDeviceDTO>();
+            foreach (var unitDevice in unitDevices)
+            {
+                list.Add(ToDto(unitDevice));
+            }
+
+            return list;
+        }
+
+        public long AddOrEdit(long unitId, long deviceId, long userId, string snCode)
+        {
+            var entity=new UnitDeviceEntity()
+            {
+                AddUserId = userId,
+                DeviceId = deviceId,
+                UnitId = unitId,
+                SNCode = snCode
+            };
+            _dbContext.UnitDevices.Add(entity);
+            _dbContext.SaveChanges();
+            return entity.Id;
+        }
+
+        public void UnitDeviceDel(long unitDeviceId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

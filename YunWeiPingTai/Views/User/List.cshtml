@@ -1,4 +1,4 @@
-﻿@model UserDTO[]
+﻿
 <form class="layui-form">
     <blockquote class="layui-elem-quote quoteBox">
         <form class="layui-form">
@@ -9,32 +9,32 @@
                 <a class="layui-btn search_btn" data-type="reload">搜索</a>
             </div>
             <div class="layui-inline">
-                <a class="layui-btn layui-btn-normal addNews_btn">添加用户</a>
+                <a class="layui-btn layui-btn-normal addUser_btn">添加用户</a>
             </div>
             <div class="layui-inline">
                 <a class="layui-btn layui-btn-danger layui-btn-normal delAll_btn">批量删除</a>
             </div>
         </form>
     </blockquote>
-    <table id="newsList" lay-filter="newsList"></table>
-    <!--审核状态-->
-    <script type="text/html" id="newsStatus">
-        {{#  if(d.newsStatus == "1"){ }}
-        <span class="layui-red">等待审核</span>
-        {{#  } else if(d.newsStatus == "0"){ }}
-        <span class="layui-blue">已存草稿</span>
-        {{#  } else { }}
-        审核通过
-        {{#  }}}
-    </script>
+    <table id="userList" lay-filter="userList">
+        
+    </table>
+
 
     <!--操作-->
-    <script type="text/html" id="newsListBar">
+    <script type="text/html" id="userListBar">
         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
         <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
-        <a class="layui-btn layui-btn-xs layui-btn-primary" lay-event="look">预览</a>
+    </script>
+    <script type="text/html" id="IsLock">
+        {{#  if(d.IsLock ===true){ }}
+        <input type="checkbox" name="IsLock" value="{{d.Id}}" lay-filter="IsLock" lay-skin="switch" lay-text="是|否" checked>
+        {{#  } else{ }}
+        <input type="checkbox" name="IsLock" value="{{d.Id}}" lay-filter="IsLock" lay-skin="switch" lay-text="是|否">
+        {{#  }}}
     </script>
 </form>
 @section Scripts{
     <script type="text/javascript" src="~/layui/layui.js"></script>
+    <script type="text/javascript" src="~/js/userList.js"></script>
 }

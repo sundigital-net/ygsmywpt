@@ -1,27 +1,30 @@
 ﻿
 @{
     ViewData["Title"] = "修改密码";
+    var userName = ViewData["UserName"];
 }
 
 <form class="layui-form layui-row changePwd">
+    @Html.AntiForgeryToken()
+    @Html.Hidden("Id", @ViewData["Id"])
     <div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
-        <div class="layui-input-block layui-red pwdTips">旧密码请输入“123456”，新密码必须两次输入一致才能提交</div>
+        <div class="layui-input-block layui-red pwdTips"></div>
         <div class="layui-form-item">
             <label class="layui-form-label">用户名</label>
             <div class="layui-input-block">
-                <input type="text" value="8899" disabled class="layui-input layui-disabled">
+                <input type="text" value="@userName" disabled class="layui-input layui-disabled">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">旧密码</label>
             <div class="layui-input-block">
-                <input type="password" value="" placeholder="请输入旧密码" lay-verify="required|oldPwd" class="layui-input pwd">
+                <input type="password" value="" placeholder="请输入旧密码" lay-verify="required|oldPwd" id="oldPwd" class="layui-input pwd">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">新密码</label>
             <div class="layui-input-block">
-                <input type="password" value="" placeholder="请输入新密码" lay-verify="required|newPwd" id="oldPwd" class="layui-input pwd">
+                <input type="password" value="" placeholder="请输入新密码" lay-verify="required|newPwd" id="newPwd" class="layui-input pwd">
             </div>
         </div>
         <div class="layui-form-item">
@@ -39,7 +42,7 @@
     </div>
 </form>
 
-@section Scripts{ 
+@section Scripts{
     <script type="text/javascript" src="~/layui/layui.js"></script>
-    <script type="text/javascript" src="~/js/user.js"></script>
+    <script type="text/javascript" src="~/js/userChangePwd.js"></script>
 }

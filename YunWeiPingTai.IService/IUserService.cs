@@ -15,10 +15,10 @@ namespace YunWeiPingTai.IService
         UserDTO GetUser(string account);
         UserDTO GetUser(long id);
         UserDTO[] GetAll();
-        bool CheckLogin(string account, string password);//手机号或者邮箱号
+        UserDTO Login(string account, string password,string ip);//手机号或者邮箱号
         long AddNew(string phoneNum, string email, string name, string password);
         void ChangePwd(string account, string password);
         void MarkDeleted(long id);
-        void UpdateStatus(long id, int status);
+        void UpdateStatus(long id, bool status);
     }
 }

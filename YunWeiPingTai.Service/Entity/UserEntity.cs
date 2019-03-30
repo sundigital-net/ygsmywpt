@@ -11,8 +11,11 @@ namespace YunWeiPingTai.Service.Entity
         public string PasswordSalt { get; set; }//100
         public string PasswordHash { get; set; }//100
         public int LoginErrorTimes { get; set; }//登陆错误次数
-        public int Status { get; set; } //审核状态
-        public int Role { get; set; }//用户角色
+        public bool IsLock { get; set; } //状态
+        public long RoleId { get; set; }//用户角色
+        public DateTime? LastSigninTime { get; set; }
+        public long SigninCount { get; set; }
+        public string LastSigninIP { get; set; }
         public DateTime? LastLoginErrorDateTime { get; set; }//最后一次登录错误时间
         public ICollection<WorkLogEntity> WorkLogs { get; set; }
         public ICollection<WorkLogReplyEntity> WorkLogReplies { get; set; }
