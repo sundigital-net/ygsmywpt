@@ -44,10 +44,10 @@ layui.use(['form', 'layer', 'table', 'laytpl'], function () {
     });
 
     //添加用户
-    function addmenu(edit) {
-        var tit = "添加角色";
+    function addMenu(edit) {
+        var tit = "添加菜单";
         if (edit) {
-            tit = "编辑角色";
+            tit = "编辑菜单";
         }
         var id = 0;
         if (edit) {
@@ -58,18 +58,18 @@ layui.use(['form', 'layer', 'table', 'laytpl'], function () {
             type: 2,
             anim: 1,
             area: ['600px', '70%'],
-            content: "/menu/Index/" + id,
+            content: "/Menu/Index/" + id,
             success: function (layero, index) {
                 var body = layui.layer.getChildFrame('body', index);
+                body.find("#Id").val(id);  //主键
                 if (edit) {
-                    body.find("#Id").val(edit.Id);  //主键
-                    body.find(".Name").val(edit.Name);
-                    body.find(".DisplayName").val(edit.DisplayName);
-                    body.find(".IconUrl").val(edit.IconUrl);
-                    body.find(".LinkUrl").val(edit.LinkUrl);
-                    body.find(".Sort").val(edit.Sort);
-                    body.find(".ParentId").val(edit.ParentId);
-                    body.find(".Remark").text(edit.Remark);    //角色备注
+                    
+                    body.find("#Name").val(edit.Name);
+                    body.find("#DisplayName").val(edit.DisplayName);
+                    body.find("#IconUrl").val(edit.IconUrl);
+                    body.find("#LinkUrl").val(edit.LinkUrl);
+                    body.find("#Sort").val(edit.Sort);
+                    body.find("#ParentId").val(edit.ParentId);
                     form.render();
 
                 }
@@ -79,7 +79,7 @@ layui.use(['form', 'layer', 'table', 'laytpl'], function () {
         window.sessionStorage.setItem("index", index);
     }
     $(".addMenus_btn").click(function () {
-        addmenu();
+        addMenu();
     });
 
     //批量删除
@@ -106,7 +106,7 @@ layui.use(['form', 'layer', 'table', 'laytpl'], function () {
             data = obj.data;
 
         if (layEvent === 'edit') { //编辑
-            addmenu(data);
+            addMenu(data);
         } else if (layEvent === 'del') { //删除
             layer.confirm('确定删除此菜单？', { icon: 3, title: '提示信息' }, function (index) {
                 del(data.Id);
@@ -131,7 +131,7 @@ layui.use(['form', 'layer', 'table', 'laytpl'], function () {
                         },
                         function() {
                             tableIns.reload();
-                            layer.close(index);
+                            layer.close();
                         });
                 } else {
                     layer.msg(data.errorMsg,
@@ -140,7 +140,7 @@ layui.use(['form', 'layer', 'table', 'laytpl'], function () {
                         },
                         function () {
                             tableIns.reload();
-                            layer.close(index);
+                            layer.close();
                         });
                 }
             },

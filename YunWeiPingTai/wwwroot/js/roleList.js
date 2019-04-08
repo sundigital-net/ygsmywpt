@@ -130,18 +130,27 @@ layui.use(['form', 'layer', 'table', 'laytpl'], function () {
         $.ajax({
             type: 'POST',
             url: '/Role/Delete/',
-            data: { roleId: roleId },
+            data: { ids: roleId },
             dataType: "json",
             headers: {
                 "X-CSRF-TOKEN-sundigital": $("input[name='AntiforgeryKey_sundigital']").val()
             },
             success: function (data) {//res为相应体,function为回调函数
-                layer.msg(data.ResultMsg, {
-                    time: 2000 //20s后自动关闭
-                }, function () {
-                    tableIns.reload();
-                    layer.close(index);
-                });
+                if (data.status === "ok") {
+                    layer.msg("操作成功",
+                        {
+                            time: 2000 //20s后自动关闭
+                        },
+                        function() {
+                            tableIns.reload();
+                            layer.close();
+                        });
+                } else {
+                    layer.msg("操作失败"+data.errorMsg,
+                        {
+                            time: 2000 //20s后自动关闭
+                        })
+                }
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 layer.alert('操作失败！！！' + XMLHttpRequest.status + "|" + XMLHttpRequest.readyState + "|" + textStatus, { icon: 5 });

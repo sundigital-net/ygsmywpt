@@ -26,11 +26,11 @@
         </div>
         <div class="layui-form-item input-item">
             <label asp-for="PhoneNum">手机号</label>
-            <input type="text" placeholder="请输入手机号" autocomplete="off" asp-for="PhoneNum" class="layui-input" lay-verify="required">
+            <input type="text" placeholder="请输入手机号" autocomplete="off" asp-for="PhoneNum" class="layui-input" lay-verify="required|phone|userphone">
         </div>
         <div class="layui-form-item input-item">
             <label asp-for="Email">邮箱</label>
-            <input type="text" placeholder="请输入邮箱" autocomplete="off" asp-for="Email" class="layui-input" lay-verify="required">
+            <input type="text" placeholder="请输入邮箱" autocomplete="off" asp-for="Email" class="layui-input" lay-verify="required|email|useremail">
         </div>
         <div class="layui-form-item input-item">
             <label asp-for="Password">密码</label>

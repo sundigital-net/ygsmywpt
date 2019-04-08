@@ -10,6 +10,7 @@ namespace YunWeiPingTai.Service.Config
         {
 
             builder.ToTable("T_Users");
+            builder.HasOne(t => t.Role).WithMany().HasForeignKey(t => t.RoleId);
             //builder.HasQueryFilter(t => !t.IsDeleted);
             /*
             builder.HasKey(t => t.Id);//这句可以不写

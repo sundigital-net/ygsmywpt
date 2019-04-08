@@ -13,6 +13,7 @@ namespace YunWeiPingTai.Service.Entity
         public int LoginErrorTimes { get; set; }//登陆错误次数
         public bool IsLock { get; set; } //状态
         public long RoleId { get; set; }//用户角色
+        public virtual RoleEntity Role { get; set; }
         public DateTime? LastSigninTime { get; set; }
         public long SigninCount { get; set; }
         public string LastSigninIP { get; set; }

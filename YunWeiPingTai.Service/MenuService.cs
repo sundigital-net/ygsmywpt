@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using YunWeiPingTai.DTO;
+using YunWeiPingTai.DTO.RequestModel;
 using YunWeiPingTai.IService;
 using YunWeiPingTai.Service.Entity;
 
@@ -76,6 +77,10 @@ namespace YunWeiPingTai.Service
 
         public long AddOrEdit(MenuDTO dto)
         {
+            if (IsExistsName(dto.Name, dto.Id))
+            {
+                return -1;
+            }
             if (dto.Id <= 0)//新增
             {
                 var entity=new MenuEntity()
@@ -159,6 +164,73 @@ namespace YunWeiPingTai.Service
             }
 
             return list.ToArray();
+        }
+
+        public MenuDTO[] GetAll(long parentId)
+        {
+            var menus = _dbContext.Menus.Include(t => t.ParentMenu).Where(t => t.ParentId == parentId).ToList();
+            var list = new List<MenuDTO>();
+            foreach (var menu in menus)
+            {
+                list.Add(Todto(menu));
+            }
+
+            return list.ToArray();
+        }
+
+        public bool IsExistsName(string name, long id)
+        {
+            bool data = false;
+            if (id > 0)
+            {
+                data = _dbContext.Menus.Any(t => t.Id != id && t.Name == name);
+            }
+            else
+            {
+                data = _dbContext.Menus.Any(t => t.Name == name);
+            }
+
+            return data;
+        }
+
+        public void MarkDelete(long[] ids)
+        {
+            if (!ids.Any())
+            {
+                throw new ArgumentException("未选择菜单信息");
+            }
+            var menus = _dbContext.Menus.Where(t => ids.Contains(t.Id)).ToList();
+            if (menus.Any())
+            {
+                foreach (var menu in menus)
+                {
+                    menu.IsDeleted = true;
+                }
+            }
+
+            _dbContext.SaveChanges();
+        }
+
+        public TableDataModel LoadData(MenuRequestModel model)
+        {
+            var menus = _dbContext.Menus.ToList();
+            if (!string.IsNullOrEmpty(model.Key))
+            {
+                menus = menus.Where(t => t.Name.Contains(model.Key)).ToList();
+            }
+            List<MenuDTO> list = new List<MenuDTO>();
+            foreach (var menu in menus)
+            {
+                list.Add(Todto(menu));
+            }
+
+
+            var table = new TableDataModel()
+            {
+                count = list.Count,
+                data = list
+            };
+            return table;
         }
     }
 }

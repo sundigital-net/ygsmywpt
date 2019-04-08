@@ -22,15 +22,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using YunWeiPingTai.DTO;
+using YunWeiPingTai.DTO.RequestModel;
 
 namespace YunWeiPingTai.IService
 {
     public interface IRoleService:IServiceSupport
     {
         long AddOrEdit(long id,string name,string remark);
-        void Delete(long id);
+        void Delete(long[] ids);
         List<MenuDTO> GetMenusByRoleId(long roleId);
         long[] GetIdsByRoleId(long roleId);
         RoleDTO[] GetAll();
+        bool IsExistsName(string name, long id);
+        TableDataModel LoadData(RoleRequestModel model);
     }
 }

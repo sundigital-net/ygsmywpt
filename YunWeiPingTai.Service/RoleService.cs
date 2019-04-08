@@ -25,6 +25,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using YunWeiPingTai.DTO;
+using YunWeiPingTai.DTO.RequestModel;
 using YunWeiPingTai.IService;
 using YunWeiPingTai.Service.Entity;
 
@@ -41,6 +42,10 @@ namespace YunWeiPingTai.Service
         }
         public long AddOrEdit(long id, string name, string remark)
         {
+            if (IsExistsName(name, id))
+            {
+                return -1;
+            }
             if (id <= 0)//新增
             {
                 var entity=new RoleEntity()
@@ -66,9 +71,22 @@ namespace YunWeiPingTai.Service
             }
         }
 
-        public void Delete(long id)
+        public void Delete(long[] ids)
         {
-            throw new NotImplementedException();
+            if (!ids.Any())
+            {
+                throw new ArgumentException("未选择角色信息");
+            }
+            var roles = _dbContext.Roles.Where(t => ids.Contains(t.Id)).ToList();
+            if (roles.Any())
+            {
+                foreach (var role in roles)
+                {
+                    role.IsDeleted = true;
+                }
+            }
+
+            _dbContext.SaveChanges();
         }
 
         private MenuDTO Todto(MenuEntity entity)
@@ -129,6 +147,43 @@ namespace YunWeiPingTai.Service
                 Remark = entity.Remark
             };
             return dto;
+        }
+
+        public bool IsExistsName(string name, long id)
+        {
+            bool data = false;
+            if (id > 0)
+            {
+                data = _dbContext.Roles.Any(t => t.Id != id && t.Name == name);
+            }
+            else
+            {
+                data = _dbContext.Roles.Any(t => t.Name == name);
+            }
+
+            return data;
+        }
+
+        public TableDataModel LoadData(RoleRequestModel model)
+        {
+            var roles = _dbContext.Roles.ToList();
+            if (!string.IsNullOrEmpty(model.Key))
+            {
+                roles = roles.Where(t => t.Name.Contains(model.Key)).ToList();
+            }
+            List<RoleDTO> list = new List<RoleDTO>();
+            foreach (var role in roles)
+            {
+                list.Add(Todto(role));
+            }
+
+
+            var table = new TableDataModel()
+            {
+                count = list.Count,
+                data = list
+            };
+            return table;
         }
     }
 }

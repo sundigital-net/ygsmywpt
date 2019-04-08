@@ -38,9 +38,9 @@ namespace YunWeiPingTai.Models
         [Display(Name="验证码")]
         [Required(ErrorMessage = "{0}必填.")]
         public string Captcha { get; set; }
-        /*
-        [Display(Name ="账号类型")]
+        
+        [Display(Name ="角色类型")]
         [Required(ErrorMessage ="{0}必填.")]
-        public int Role { get; set; }*/
+        public long RoleId { get; set; }
     }
 }

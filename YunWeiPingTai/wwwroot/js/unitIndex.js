@@ -50,7 +50,7 @@ layui.use(['form', 'layer', 'authtree'], function () {
         return false;
     });
     form.verify({
-        Name: function (value, item) { //value：表单的值、item：表单的DOM对象
+        unitname: function (value, item) { //value：表单的值、item：表单的DOM对象
             if (!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)) {
                 return '单位名称不能有特殊字符';
             }
@@ -70,7 +70,7 @@ layui.use(['form', 'layer', 'authtree'], function () {
                 },
                 dataType: 'json',
                 success: function (res) {
-                    if (res.Data === true) {
+                    if (res === true) {
                         msg = "系统已存在相同的单位名称，请修改后再进行操作";
                     }
                 },

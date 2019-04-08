@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using YunWeiPingTai.DTO;
+using YunWeiPingTai.DTO.RequestModel;
 
 namespace YunWeiPingTai.IService
 {
@@ -10,10 +11,13 @@ namespace YunWeiPingTai.IService
         long AddOrEdit(long id,string name, string address, string linkMan, string tel, string phoneNum);
         List<UnitDTO> GetAll();
         UnitDTO GetById(long id);
-        void UnitDel(long unitId);
+        void UnitDel(long[] unitIds);
         UnitDeviceDTO GetUnitDevice(long id);
         List<UnitDeviceDTO> GetByUnitId(long unitId);
-        long AddOrEdit(long unitId, long deviceId, long userId,string snCode);
+        long AddOrEdit(long id,long unitId, long deviceId, long userId,string snCode);
         void UnitDeviceDel(long unitDeviceId);
+        bool IsExistsName(string name, long id);
+        TableDataModel LoadData(UnitRequestModel model);
+        TableDataModel LoadData(UnitDeviceRequestModel model);
     }
 }

@@ -22,14 +22,17 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using YunWeiPingTai.DTO;
+using YunWeiPingTai.DTO.RequestModel;
 
 namespace YunWeiPingTai.IService
 {
     public interface IDeviceService:IServiceSupport
     {
         DeviceDTO GetById(long id);
-        DeviceDTO[] GetAll();
-        long AddNew(string name, string version,string maker);
-        void Delete(long id);
+        List<DeviceDTO> GetAll();
+        long AddOrEdit(long id,string name, string version,string maker);
+        void Delete(long[] ids);
+        bool IsExistsName(string name,string version, long id);
+        TableDataModel LoadData(DeviceRequestModel model);
     }
 }

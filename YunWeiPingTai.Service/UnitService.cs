@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using YunWeiPingTai.DTO;
+using YunWeiPingTai.DTO.RequestModel;
 using YunWeiPingTai.IService;
 using YunWeiPingTai.Service.Entity;
 
@@ -18,15 +20,12 @@ namespace YunWeiPingTai.Service
         }
         public long AddOrEdit(long id,string name, string address, string linkMan, string tel, string phoneNum)
         {
+            if (IsExistsName(name, id))
+            {
+                return -1;
+            }
             if (id <= 0)
             {
-                //查重
-                /*
-                var exsit = _dbContext.Units.Any(t => t.Name == name);
-                if (exsit)
-                {
-                    return -1;
-                }*/
                 var entity = new UnitEntity()
                 {
                     Name = name,
@@ -90,13 +89,20 @@ namespace YunWeiPingTai.Service
             return unit == null ? null : ToDto(unit);
         }
 
-        public void UnitDel(long unitId)
+        public void UnitDel(long[] unitIds)
         {
-            var unit = _dbContext.Units.SingleOrDefault(t => t.Id == unitId);
-            if (unit == null)
-            { throw new ArgumentException("单位信息不存在：id=" + unitId); }
-
-            unit.IsDeleted = true;
+            if (!unitIds.Any())
+            {
+                throw new ArgumentException("未选择单位信息");
+            }
+            var units = _dbContext.Units.Where(t => unitIds.Contains(t.Id)).ToList();
+            if (units.Any())
+            {
+                foreach (var unit in units)
+                {
+                    unit.IsDeleted = true;
+                }
+            }
             _dbContext.SaveChanges();
         }
 
@@ -119,13 +125,15 @@ namespace YunWeiPingTai.Service
         }
         public UnitDeviceDTO GetUnitDevice(long id)
         {
-            var unitDevice = _dbContext.UnitDevices.SingleOrDefault(t => t.Id == id);
+            var unitDevice = _dbContext.UnitDevices.Include(t=>t.Device)
+                .Include(t=>t.Unit).Include(t=>t.AddUser).SingleOrDefault(t => t.Id == id);
             return unitDevice == null ? null : ToDto(unitDevice);
         }
 
         public List<UnitDeviceDTO> GetByUnitId(long unitId)
         {
-            var unitDevices = _dbContext.UnitDevices.Where(t => t.UnitId == unitId).ToList();
+            var unitDevices = _dbContext.UnitDevices.Include(t => t.Device)
+                .Include(t => t.Unit).Include(t => t.AddUser).Where(t => t.UnitId == unitId).ToList();
             var list=new List<UnitDeviceDTO>();
             foreach (var unitDevice in unitDevices)
             {
@@ -135,23 +143,107 @@ namespace YunWeiPingTai.Service
             return list;
         }
 
-        public long AddOrEdit(long unitId, long deviceId, long userId, string snCode)
+        public long AddOrEdit(long id,long unitId, long deviceId, long userId, string snCode)
         {
-            var entity=new UnitDeviceEntity()
+            if (_dbContext.UnitDevices.Any(t => t.SNCode == snCode))
             {
-                AddUserId = userId,
-                DeviceId = deviceId,
-                UnitId = unitId,
-                SNCode = snCode
-            };
-            _dbContext.UnitDevices.Add(entity);
-            _dbContext.SaveChanges();
-            return entity.Id;
+                return -1;
+            }
+
+            if (id <= 0)//新增
+            {
+                var entity = new UnitDeviceEntity()
+                {
+                    AddUserId = userId,
+                    DeviceId = deviceId,
+                    UnitId = unitId,
+                    SNCode = snCode
+                };
+                _dbContext.UnitDevices.Add(entity);
+                _dbContext.SaveChanges();
+                return entity.Id;
+            }
+            else//修改
+            {
+                var entity = _dbContext.UnitDevices.SingleOrDefault(t => t.Id == id);
+                if (entity == null)
+                {
+                    throw new ArgumentException("不存在的设备信息，Id="+id);
+                }
+
+                entity.UnitId = unitId;
+                entity.SNCode = snCode;
+                entity.DeviceId = deviceId;
+                entity.AddUserId = userId;
+                _dbContext.SaveChanges();
+                return id;
+            }
+            
         }
 
         public void UnitDeviceDel(long unitDeviceId)
         {
             throw new NotImplementedException();
+        }
+
+        public bool IsExistsName(string name, long id)
+        {
+            var data = false;
+            if (id > 0)
+            {
+                data = _dbContext.Units.Any(t => t.Id != id && t.Name == name);
+            }
+            else
+            {
+                data= _dbContext.Units.Any(t => t.Name == name);
+            }
+
+            return data;
+        }
+
+        public TableDataModel LoadData(UnitRequestModel model)
+        {
+            var units = _dbContext.Units.ToList();
+            if (!string.IsNullOrEmpty(model.Key))
+            {
+                units = units.Where(t => t.Name.Contains(model.Key)).ToList();
+            }
+            List<UnitDTO> list = new List<UnitDTO>();
+            foreach (var unit in units)
+            {
+                list.Add(ToDto(unit));
+            }
+
+
+            var table = new TableDataModel()
+            {
+                count = list.Count,
+                data = list
+            };
+            return table;
+        }
+
+        public TableDataModel LoadData(UnitDeviceRequestModel model)
+        {
+            var devices = _dbContext.UnitDevices.Include(t => t.Device)
+                .Include(t => t.Unit).Include(t => t.AddUser).Where(t=>t.UnitId==model.UnitId).ToList();
+            if (!string.IsNullOrEmpty(model.Key))
+            {
+                devices = devices.Where(t => t.Device.Name.Contains(model.Key)).ToList();
+            }
+            List<UnitDeviceDTO> list = new List<UnitDeviceDTO>();
+            foreach (var device in devices)
+            {
+                list.Add(ToDto(device));
+            }
+
+
+            var table = new TableDataModel()
+            {
+                count = list.Count,
+                data = list
+            };
+            return table;
         }
     }
 }

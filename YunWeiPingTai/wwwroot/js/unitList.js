@@ -40,12 +40,40 @@ layui.use(['form','layer','table','laytpl'],function(){
             layer.msg("请输入搜索的内容");
         }
     });
+    //单位设备
+    function deviceList(unitId) {
+        var index = layui.layer.open({
+            title: "设备清单",
+            type: 2,
+            content: "/Unit/DeviceList?unitId="+unitId,
+            success: function (index) {
+                var body = layui.layer.getChildFrame('body', index);
+                body.find("#UnitId").val(unitId);
+                setTimeout(function () {
+                        layui.layer.tips('点击此处返回单位列表',
+                            '.layui-layer-setwin .layui-layer-close',
+                            {
+                                tips: 3
+                            });
+                    },
+                    500);
+            }
+        });
+        layui.layer.full(index);
+        window.sessionStorage.setItem("index", index);
+        //改变窗口大小时，重置弹窗的宽高，防止超出可视区域（如F12调出debug的操作）
+        $(window).on("resize",
+            function () {
+                layui.layer.full(window.sessionStorage.getItem("index"));
+            });
+    }
 
     //添加用户
     function addUnit(edit) {
-
+        var id = 0;
         var tit="添加单位";
         if (edit) {
+            id = edit.Id;
             tit = "编辑单位";
         }
         var index = layui.layer.open({
@@ -54,8 +82,8 @@ layui.use(['form','layer','table','laytpl'],function(){
             content: "/Unit/Index",
             success: function(layero, index) {
                 var body = layui.layer.getChildFrame('body', index);
+                body.find("#Id").val(id);
                 if (edit) {
-                    body.find("#Id").val(edit.Id);
                     body.find("#Name").val(edit.Name);
                     body.find("#Address").val(edit.Address);
                     body.find("#Tel").val(edit.Tel);
@@ -90,20 +118,15 @@ layui.use(['form','layer','table','laytpl'],function(){
     $(".delAll_btn").click(function() {
         var checkStatus = table.checkStatus('unitListTable'),
             data = checkStatus.data,
-            newsId = [];
+            unitIds = [];
         if (data.length > 0) {
             for (var i in data) {
-                newsId.push(data[i].newsId);
+                unitIds.push(data[i].newsId);
             }
             layer.confirm('确定删除选中的单位？',
                 { icon: 3, title: '提示信息' },
                 function(index) {
-                    // $.get("删除文章接口",{
-                    //     newsId : newsId  //将需要删除的newsId作为参数传入
-                    // },function(data){
-                    tableIns.reload();
-                    layer.close(index);
-                    // })
+                    del(unitIds);
                 });
         } else {
             layer.msg("请选择需要删除的单位");
@@ -122,13 +145,18 @@ layui.use(['form','layer','table','laytpl'],function(){
             },
             success: function (data) {//data为相应体,function为回调函数
                 if (data.status === "ok") {
-
+                    layer.msg("操作成功", {
+                        time: 2000 //2s后自动关闭
+                    }, function () {
+                        tableIns.reload();
+                        layer.close();
+                    });
                 } else {
                     layer.msg(data.errorMsg, {
                         time: 2000 //2s后自动关闭
                     }, function () {
                         tableIns.reload();
-                        layer.close(index);
+                        layer.close();
                     });
                 }
             },
@@ -145,32 +173,14 @@ layui.use(['form','layer','table','laytpl'],function(){
         var layEvent = obj.event,
             data = obj.data;
 
-        if(layEvent === 'edit'){ //编辑
+        if (layEvent === 'edit') { //编辑
             addUnit(data);
-        }else if(layEvent === 'usable'){ //启用禁用
-            var _this = $(this),
-                usableText = "是否确定禁用此单位？",
-                btnText = "已禁用";
-            if(_this.text()=="已禁用"){
-                usableText = "是否确定启用此单位？",
-                btnText = "已启用";
-            }
-            layer.confirm(usableText,{
-                icon: 3,
-                title:'系统提示',
-                cancel : function(index){
-                    layer.close(index);
-                }
-            },function(index){
-                _this.text(btnText);
-                layer.close(index);
-            },function(index){
-                layer.close(index);
-            });
-        }else if(layEvent === 'del'){ //删除
-            layer.confirm('确定删除此单位？',{icon:3, title:'提示信息'},function(index) {
+        } else if (layEvent === 'del') { //删除
+            layer.confirm('确定删除此单位？', { icon: 3, title: '提示信息' }, function (index) {
                 del(data.Id);
             });
+        } else if (layEvent === "deviceList") {//查看设备
+            deviceList(data.Id);
         }
     });
 

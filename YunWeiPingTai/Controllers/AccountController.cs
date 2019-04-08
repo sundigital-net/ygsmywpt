@@ -139,7 +139,7 @@ namespace YunWeiPingTai.Controllers
             }
 
             //
-            var id = _userSvc.AddNew(model.PhoneNum, model.Email, model.Name, model.Password);
+            var id = _userSvc.AddNew(model.PhoneNum, model.Email, model.Name, model.Password,model.RoleId,true);
             if (id == -1)
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "电子邮箱或者手机号已经存在。" });
@@ -279,6 +279,10 @@ namespace YunWeiPingTai.Controllers
             return Json(new AjaxResult() { Status = "ok" });
         }
 
-        
+        public bool IsExistsAccount(string account, long id)
+        {
+            var result = _userSvc.IsExistsAccount(account, 0);
+            return result;
+        }
     }
 }

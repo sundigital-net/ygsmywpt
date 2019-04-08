@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using YunWeiPingTai.Common;
+using YunWeiPingTai.DTO.RequestModel;
 using YunWeiPingTai.Extensions;
 using YunWeiPingTai.IService;
 using YunWeiPingTai.Models;
 
 namespace YunWeiPingTai.Controllers
 {
+    [Authorize]
     public class RoleController : Controller
     {
         private readonly IRoleService _roleService;
@@ -49,7 +52,7 @@ namespace YunWeiPingTai.Controllers
                     var roleId = _roleService.AddOrEdit(model.Id, model.Name, model.Remark);
                     if (roleId <= 0)
                     {
-                        return Json(new AjaxResult() { Status = "error", ErrorMsg = "出错了" });
+                        return Json(new AjaxResult() { Status = "error", ErrorMsg = "已存在相同的角色名称" });
                     }
 
                     _menuService.AddMenuIds(roleId, model.MenuIds);
@@ -71,15 +74,23 @@ namespace YunWeiPingTai.Controllers
             return View();
         }
 
-        public string LoadData()
+        public string LoadData([FromQuery]RoleRequestModel model)
         {
-            var roles = _roleService.GetAll();
-            var tableData = new TableDataModel()
-            {
-                count = roles.Length,
-                data = roles
-            };
+            var tableData = _roleService.LoadData(model);
             return JsonHelper.ObjectToJSON(tableData);
+        }
+
+        [HttpPost]
+        public IActionResult Delete(long[] ids)
+        {
+            _roleService.Delete(ids);
+            return Json(new AjaxResult() {Status = "ok"});
+        }
+        [HttpGet]
+        public bool IsExistsName([FromQuery]RoleAddEditPostModel item)
+        {
+            var result = _roleService.IsExistsName(item.Name, item.Id);
+            return result;
         }
     }
 }

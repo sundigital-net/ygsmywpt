@@ -47,7 +47,54 @@ layui.use(['form','layer','jquery'],function(){
             },1000);*/
             return false;
         });
-
+    form.verify({
+        userphone: function(value, item) {
+            var msg;
+            $.ajax({
+                url: "/Account/IsExistsAccount/",
+                async: false,
+                data: {
+                    Account: value,
+                    Id: $("#Id").val()
+                },
+                dataType: 'json',
+                success: function (res) {
+                    if (res === true) {
+                        msg = "系统已存在相同的账号，请修改后再进行操作";
+                    }
+                },
+                error: function (xml, errstr, err) {
+                    msg = "系统异常，请稍候再试";
+                }
+            });
+            if (msg) {
+                return msg;
+            }
+        },
+        useremail: function (value, item) {
+            var msg;
+            $.ajax({
+                url: "/Account/IsExistsAccount/",
+                async: false,
+                data: {
+                    Account: value,
+                    Id: $("#Id").val()
+                },
+                dataType: 'json',
+                success: function (res) {
+                    if (res === true) {
+                        msg = "系统已存在相同的账号，请修改后再进行操作";
+                    }
+                },
+                error: function (xml, errstr, err) {
+                    msg = "系统异常，请稍候再试";
+                }
+            });
+            if (msg) {
+                return msg;
+            }
+        }
+    });
     //表单输入效果
     $(".loginBody .input-item").click(function(e) {
         e.stopPropagation();
