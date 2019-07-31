@@ -47,7 +47,7 @@ namespace YunWeiPingTai.Service
         {
             var dto = new UserDTO();
             var admin = _dbContext.AdminUsers.Include(t => t.Role).SingleOrDefault(t => t.PhoneNum == account || t.Email == account);
-            if(admin!=null)
+            if (admin != null)
             {
                 string dbPwdHash = admin.PasswordHash;
                 string adminPwdHash = CommonHelper.CalcMD5(admin.PasswordSalt + password);
@@ -58,10 +58,16 @@ namespace YunWeiPingTai.Service
                     admin.LastSigninIP = ip;
                     _dbContext.SaveChanges();
                     dto = ToDTO(admin);
+                    return dto;
                 }
-            }
+                else
+                    return null;
 
-            return dto;
+            }
+            else
+                return null;
+
+
         }
 
         private UserDTO ToDTO(UserEntity entity)

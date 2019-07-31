@@ -74,7 +74,8 @@ namespace YunWeiPingTai.Controllers
             }
 
             #region 验证码
-            var serverCaptcha = (string)TempData["CaptchaStr"];
+            var serverCaptcha = (string)HttpContext.Session.GetString("CaptchaStr");
+            
             if (string.IsNullOrEmpty(serverCaptcha) || serverCaptcha.ToLower() != model.Captcha.ToLower())//不区分大小写，一律转换成小写再去比较
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "验证码错误。" });
@@ -132,7 +133,7 @@ namespace YunWeiPingTai.Controllers
                 return Json(new AjaxResult { Status = "error", ErrorMsg = MvcHelper.GetValidMsg(ModelState) });
             }
             //验证码
-            var serverCaptcha = (string)TempData["CaptchaStr"];
+            var serverCaptcha = (string)HttpContext.Session.GetString("CaptchaStr");
             if (string.IsNullOrEmpty(serverCaptcha) || serverCaptcha.ToLower() != model.Captcha.ToLower())//不区分大小写，一律转换成小写再去比较
             {
                 return Json(new AjaxResult { Status = "error", ErrorMsg = "验证码错误。" });
@@ -165,7 +166,7 @@ namespace YunWeiPingTai.Controllers
             {
                 //创建字符串并保存到TempData
                 var code = VerifyCodeHelper.GetSingleObj().CreateVerifyCode(VerifyCodeHelper.VerifyCodeType.AbcVerifyCode, 4);
-                TempData["CaptchaStr"] = code;
+                HttpContext.Session.SetString("CaptchaStr",code);
                 //生成img
                 var codeImg = VerifyCodeHelper.GetSingleObj().CreateByteByImgVerifyCode(code, 90, 36);
                 return File(codeImg, @"image/jpeg");

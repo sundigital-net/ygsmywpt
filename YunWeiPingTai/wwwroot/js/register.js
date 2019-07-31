@@ -5,14 +5,14 @@ layui.use(['form','layer','jquery'],function(){
 
    
 
-    //登录按钮
+    //注册按钮
     form.on("submit(register)",
         function(data) {
             var btn = $(this);
             btn.text("注册中...").attr("disabled", "disabled").addClass("layui-disabled");
-            //登录过程
+            //注册过程
 
-            var formData = $("#reg-form").serializeArray();
+            //var formData = $("#reg-form").serializeArray();
             $.ajax({
                 url: "/Account/Register",
                 type: "POST",
@@ -20,7 +20,7 @@ layui.use(['form','layer','jquery'],function(){
                 //data: formData,
                 data: data.field,
                 success: function(res) {
-                    if (res.status == "ok") {
+                    if (res.status === "ok") {
                         layer.msg("注册成功，正在登录...");
                         setTimeout(function() {
                                 window.location.href = "/Home/Index";
@@ -48,7 +48,7 @@ layui.use(['form','layer','jquery'],function(){
             return false;
         });
     form.verify({
-        userphone: function(value, item) {
+        userPhone: function(value, item) {
             var msg;
             $.ajax({
                 url: "/Account/IsExistsAccount/",
@@ -71,7 +71,7 @@ layui.use(['form','layer','jquery'],function(){
                 return msg;
             }
         },
-        useremail: function (value, item) {
+        userEmail: function (value, item) {
             var msg;
             $.ajax({
                 url: "/Account/IsExistsAccount/",
@@ -92,6 +92,11 @@ layui.use(['form','layer','jquery'],function(){
             });
             if (msg) {
                 return msg;
+            }
+        },
+        pwd: function(value, item) {
+            if (!new RegExp("(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{6,30}").test(value)) {
+                return '密码必须包含大、小写字母以及数字，且长度大于6并小于30';
             }
         }
     });

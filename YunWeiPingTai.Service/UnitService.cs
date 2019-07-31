@@ -102,8 +102,8 @@ namespace YunWeiPingTai.Service
                 {
                     unit.IsDeleted = true;
                 }
+                _dbContext.SaveChanges();
             }
-            _dbContext.SaveChanges();
         }
 
         private UnitDeviceDTO ToDto(UnitDeviceEntity entity)
@@ -181,9 +181,23 @@ namespace YunWeiPingTai.Service
             
         }
 
-        public void UnitDeviceDel(long unitDeviceId)
+        public void UnitDeviceDel(long[] unitDeviceIds)
         {
-            throw new NotImplementedException();
+            if (!unitDeviceIds.Any())
+            {
+                throw new ArgumentException("未选择任何设备信息");
+            }
+
+            var unitDevices = _dbContext.UnitDevices.Where(t => unitDeviceIds.Contains(t.Id)).ToList();
+            if (unitDevices.Any())
+            {
+                foreach (var dev in unitDevices)
+                {
+                    dev.IsDeleted = true;
+                }
+
+                _dbContext.SaveChanges();
+            }
         }
 
         public bool IsExistsName(string name, long id)

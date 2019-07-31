@@ -108,11 +108,11 @@ layui.use(['form','layer','table','laytpl'],function(){
     });
 
 
-    function del(unitId) {
+    function del(unitDeviceIds) {
         $.ajax({
             type: 'POST',
             url: '/Unit/DeleteDevice/',
-            data: { ids: unitId },
+            data: { ids: unitDeviceIds },
             dataType: "json",
             headers: {
                 "X-CSRF-TOKEN-sundigital": $("input[name='AntiforgeryKey_sundigital']").val()

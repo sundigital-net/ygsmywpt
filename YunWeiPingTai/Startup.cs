@@ -37,7 +37,7 @@ namespace YunWeiPingTai
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
+                options.CheckConsentNeeded = context => false;//这里要改为false，默认是true，true的时候session无效
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
@@ -77,7 +77,7 @@ namespace YunWeiPingTai
             services.AddEntityFrameworkSqlServer().AddDbContext<MyDbContext>(t => t.UseSqlServer(connectionstr));
             #endregion
 
-            # region 添加Identity服务和所有依赖相关的服务--停用
+            #region 添加Identity服务和所有依赖相关的服务--停用
             /*
             services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(connectionstr, b => b.MigrationsAssembly(nameof(YunWeiPingTai))));
             services.AddDefaultIdentity<IdentityUser>()
@@ -121,20 +121,22 @@ namespace YunWeiPingTai
             #endregion
 
             #region 配置redisCache、session并注册
-            var redisConn = Configuration["Redis:Connection"];
-            var redisInstanceName = Configuration["Redis:InstanceName"];
-            var sessionOutTime = Configuration.GetValue<int>("SessionTimeOut");
+            //var redisConn = Configuration["Redis:Connection"];
+            //var redisInstanceName = Configuration["Redis:InstanceName"];
+
             //配置RedisCache
-            services.AddDistributedRedisCache(options =>
-            {
-                options.Configuration = redisConn;
-                options.InstanceName = redisInstanceName;
-            });
+            //services.AddDistributedRedisCache(options =>
+            //{
+            //    options.Configuration = redisConn;
+            //    options.InstanceName = redisInstanceName;
+            //});
             //添加session并设置过期时间
+            services.AddDistributedMemoryCache();//启用session之前必须先添加内存
+            var sessionOutTime = Configuration.GetValue<int>("SessionTimeOut");
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(sessionOutTime);
-                options.Cookie.HttpOnly = true;
+                options.Cookie.HttpOnly = true;//设置在浏览器不能通过js获得该cookie的值
             });
             #endregion
 
@@ -179,7 +181,7 @@ namespace YunWeiPingTai
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseFileServer();//对下面两个中间件的封装
             //app.UseDefaultFiles();//注意写在useStaticFiles之前
             //app.UseStaticFiles();//使用静态文件
@@ -203,6 +205,7 @@ namespace YunWeiPingTai
             });
             */
             app.UseMvcWithDefaultRoute();
+            
         }
     }
 }

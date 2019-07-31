@@ -12,7 +12,7 @@ namespace YunWeiPingTai.Service
         public MyDbContext(DbContextOptions<MyDbContext> options):base(options)
         {
             //Code First，如果没有数据库则会创建一个数据库，如果存在，则这句话不起任何作用。
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
             //数据库迁移
             //Database.Migrate();
         }

@@ -116,5 +116,13 @@ namespace YunWeiPingTai.Controllers
 
             return Json(new AjaxResult() {Status = "ok"});
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteDevice(long[] ids)
+        {
+            _unitSvc.UnitDeviceDel(ids);
+            return Json(new AjaxResult() {Status = "ok"});
+        }
     }
 }

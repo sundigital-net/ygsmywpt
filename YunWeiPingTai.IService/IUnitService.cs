@@ -15,7 +15,7 @@ namespace YunWeiPingTai.IService
         UnitDeviceDTO GetUnitDevice(long id);
         List<UnitDeviceDTO> GetByUnitId(long unitId);
         long AddOrEdit(long id,long unitId, long deviceId, long userId,string snCode);
-        void UnitDeviceDel(long unitDeviceId);
+        void UnitDeviceDel(long[] unitDeviceIds);
         bool IsExistsName(string name, long id);
         TableDataModel LoadData(UnitRequestModel model);
         TableDataModel LoadData(UnitDeviceRequestModel model);

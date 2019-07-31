@@ -6,7 +6,7 @@
 <html class="loginHtml">
 <head>
     <meta charset="utf-8">
-    <title>登录--运维管理平台1.0</title>
+    <title>注册--运维管理平台1.0</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -26,19 +26,19 @@
         </div>
         <div class="layui-form-item input-item">
             <label asp-for="PhoneNum">手机号</label>
-            <input type="text" placeholder="请输入手机号" autocomplete="off" asp-for="PhoneNum" class="layui-input" lay-verify="required|phone|userphone">
+            <input type="text" placeholder="请输入手机号" autocomplete="off" asp-for="PhoneNum" class="layui-input" lay-verify="required|phone|userPhone">
         </div>
         <div class="layui-form-item input-item">
             <label asp-for="Email">邮箱</label>
-            <input type="text" placeholder="请输入邮箱" autocomplete="off" asp-for="Email" class="layui-input" lay-verify="required|email|useremail">
+            <input type="text" placeholder="请输入邮箱" autocomplete="off" asp-for="Email" class="layui-input" lay-verify="required|email|userEmail">
         </div>
         <div class="layui-form-item input-item">
             <label asp-for="Password">密码</label>
-            <input type="password" placeholder="请输入密码" autocomplete="off" asp-for="Password" class="layui-input" lay-verify="required">
+            <input type="password" placeholder="请输入密码" autocomplete="off" asp-for="Password" class="layui-input" lay-verify="required|pwd">
         </div>
         <div class="layui-form-item input-item">
             <label asp-for="PasswordConfirm">确认密码</label>
-            <input type="password" placeholder="请输入确认密码" autocomplete="off" asp-for="PasswordConfirm" class="layui-input" lay-verify="required">
+            <input type="password" placeholder="请输入确认密码" autocomplete="off" asp-for="PasswordConfirm" class="layui-input" lay-verify="required|pwd">
         </div>
         <div class="layui-form-item input-item" id="imgCode">
             <label asp-for="Captcha">验证码</label>
